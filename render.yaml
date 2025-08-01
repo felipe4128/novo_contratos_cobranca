@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: contratos-cobranca
+    env: python
+    region: oregon # ou sua preferência
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: FLASK_ENV
+        value: "production"
