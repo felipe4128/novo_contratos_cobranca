@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, flash
+from flask import Flask, render_template, request, redirect, url_for, send_file
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -7,12 +7,12 @@ from io import BytesIO
 import os
 
 app = Flask(__name__)
-app.secret_key = 'dev'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///credito.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 class Contrato(db.Model):
+    # existing fields
     id = db.Column(db.Integer, primary_key=True)
     cpf = db.Column(db.String(14), nullable=True)
     cliente = db.Column(db.String(100), nullable=True)
@@ -48,9 +48,18 @@ class Contrato(db.Model):
     obs_contas_receber = db.Column(db.Text, nullable=True)
     valor_repassar_escritorio = db.Column(db.Float, nullable=True)
 
-@app.before_request
-def before_request():
-    db.create_all()
+
+class Parcela(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    contrato_id = db.Column(db.Integer, db.ForeignKey('contrato.id'), nullable=False)
+    numero = db.Column(db.Integer, nullable=False)
+    due_date = db.Column(db.Date, nullable=False)
+    value = db.Column(db.Float, nullable=False)
+    baixa = db.Column(db.Boolean, default=False)
+    data_baixa = db.Column(db.Date, nullable=True)
+
+    contrato = db.relationship('Contrato', backref=db.backref('parcelas_list', lazy=True))
+
 
 @app.route('/')
 def index():
@@ -100,4 +109,124 @@ def novo():
         return redirect(url_for('index'))
     return render_template('novo.html')
 
-# Demais rotas abaixo...
+
+@app.route('/info/<int:id>', methods=['GET', 'POST'])
+def editar_info(id):
+    c = Contrato.query.get_or_404(id)
+    if request.method == 'POST':
+        # Map all fields
+        fields = ['cpf','cliente','numero','tipo_contrato','cooperado','garantia',
+                  'obs_contabilidade','obs_contas_receber']
+        for field in fields:
+            setattr(c, field, request.form.get(field))
+        num_fields = ['valor','valor_pago','valor_contrato_sistema','valor_abatido','ganho',
+                      'custas','custas_deduzidas','protesto','protesto_deduzido','honorario',
+                      'honorario_repassado','alvara','alvara_recebido','valor_entrada',
+                      'valor_das_parcelas','valor_repassar_escritorio']
+        for nf in num_fields:
+            val = request.form.get(nf)
+            if val:
+                setattr(c, nf, float(val))
+        int_fields = ['parcelas','parcelas_restantes','quantidade_boletos_emitidos']
+        for inf in int_fields:
+            val = request.form.get(inf)
+            if val:
+                setattr(c, inf, int(val))
+        date_fields = ['vencimento_entrada','vencimento_parcelas','data_pg_boleto','data_baixa']
+        for df in date_fields:
+            val = request.form.get(df)
+            if val:
+                setattr(c, df, datetime.strptime(val, '%Y-%m-%d'))
+        c.baixa_acima_48_meses = True if request.form.get('baixa_acima_48_meses') else False
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('info.html', contrato=c)
+
+
+@app.route('/parcelas/<int:id>')
+def parcelas(id):
+    c = Contrato.query.get_or_404(id)
+    # generate parcelas if not exist
+    if not Parcela.query.filter_by(contrato_id=c.id).first():
+        first_due = c.vencimento_parcelas or c.vencimento_entrada
+        if first_due and c.parcelas and c.valor_das_parcelas:
+            for i in range(c.parcelas):
+                due = first_due + relativedelta(months=i)
+                p = Parcela(contrato_id=c.id, numero=i+1, due_date=due, value=c.valor_das_parcelas)
+                db.session.add(p)
+            db.session.commit()
+    parcels = Parcela.query.filter_by(contrato_id=c.id).order_by(Parcela.numero).all()
+    return render_template('parcelas.html', contrato=c, parcels=parcels)
+
+@app.route('/parcelas/<int:contrato_id>/baixar/<int:parcela_id>', methods=['POST'])
+def baixar_parcela(contrato_id, parcela_id):
+    p = Parcela.query.get_or_404(parcela_id)
+    p.baixa = True
+    p.data_baixa = datetime.today().date()
+    # update valor_pago
+    c = p.contrato
+    c.valor_pago = (c.valor_pago or 0) + p.value
+    db.session.commit()
+    return redirect(url_for('parcelas', id=contrato_id))
+
+@app.route('/exportar')
+def exportar():
+    contratos = Contrato.query.all()
+    data = [{
+        'ID': c.id,
+        'CPF': c.cpf,
+        'Cliente': c.cliente,
+        'Contrato': c.numero,
+        'Tipo': c.tipo_contrato,
+        'Cooperado': c.cooperado,
+        'Garantia': c.garantia,
+        'Valor Contrato': c.valor,
+        'Valor Pago': c.valor_pago,
+        'Valor no Sistema': c.valor_contrato_sistema,
+        'Baixa >48m': c.baixa_acima_48_meses,
+        'Valor Abatido': c.valor_abatido,
+        'Ganho': c.ganho,
+        'Custas': c.custas,
+        'Custas Deduzidas': c.custas_deduzidas,
+        'Protesto': c.protesto,
+        'Protesto Deduzido': c.protesto_deduzido,
+        'Honorário': c.honorario,
+        'Honorário Repassado': c.honorario_repassado,
+        'Alvará': c.alvara,
+        'Alvará Recebido': c.alvara_recebido,
+        'Valor Entrada': c.valor_entrada,
+        'Vencimento Entrada': c.vencimento_entrada,
+        'Valor das Parcelas': c.valor_das_parcelas,
+        'Parcelas': c.parcelas,
+        'Parcelas Restantes': c.parcelas_restantes,
+        'Vencimento Parcelas': c.vencimento_parcelas,
+        'Qtde Boletos Emitidos': c.quantidade_boletos_emitidos,
+        'Valor Pg Boleto': c.valor_pg_com_boleto,
+        'Data Pg Boleto': c.data_pg_boleto,
+        'Data da Baixa': c.data_baixa,
+        'Obs Contabilidade': c.obs_contabilidade,
+        'Obs Contas a Receber': c.obs_contas_receber,
+        'Valor Repassar Escritório': c.valor_repassar_escritorio
+    } for c in contratos]
+    df = pd.DataFrame(data)
+    buf = BytesIO()
+    with pd.ExcelWriter(buf, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False)
+    buf.seek(0)
+    return send_file(buf, download_name='contratos_completos.xlsx', as_attachment=True)
+
+
+
+
+@app.route('/delete/<int:id>', methods=['POST'])
+def delete(id):
+    c = Contrato.query.get_or_404(id)
+    db.session.delete(c)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    # create tables on startup
+    with app.app_context():
+        db.create_all()
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
