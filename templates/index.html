@@ -1,14 +1,63 @@
-<!doctype html><html lang="pt-br"><head><meta charset="utf-8"><title>Contratos Cobrança</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head><body>
-<nav class="navbar navbar-dark bg-dark"><div class="container-fluid"><span class="navbar-brand">Contratos Cobrança</span>
-<div><a href="{{ url_for('novo') }}" class="btn btn-success">Novo Contrato</a>
-<a href="{{ url_for('exportar') }}" class="btn btn-primary">Exportar</a></div></div></nav>
-<div class="container mt-4"><table class="table table-striped"><thead><tr>
-<th>CPF</th><th>Cliente</th><th>Contrato</th><th>Tipo</th><th>Valor</th><th>Pago</th><th>Parcelas</th><th>Info</th><th>Excluir</th>
-</tr></thead><tbody>{% for c in contratos %}<tr>
-<td>{{ c.cpf }}</td><td>{{ c.cliente }}</td><td>{{ c.numero }}</td><td>{{ c.tipo_contrato }}</td>
-<td>{{ c.valor }}</td><td>{{ c.valor_pago }}</td>
-<td><a href="{{ url_for('parcelas',id=c.id) }}" class="btn btn-primary btn-sm">Parcelas</a></td>
-<td><a href="{{ url_for('editar_info',id=c.id) }}" class="btn btn-secondary btn-sm">Info</a></td>
-<td><form action="{{ url_for('delete', id=c.id) }}" method="post" style="display:inline;"><button type="submit" class="btn btn-danger btn-sm">Excluir</button></form></td>
-</tr>{% endfor %}</tbody></table></div></body></html>
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Contratos Cobrança</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Contratos Cobrança</h4>
+    <div class="btn-group">
+      <a href="{{ url_for('novo') }}" class="btn btn-success">Novo Contrato</a>
+      <a href="{{ url_for('exportar') }}" class="btn btn-primary">Exportar</a>
+      <a href="{{ url_for('relatorio_parcelas_pagas') }}" class="btn btn-outline-secondary">Relatório (Pagas)</a>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{cat}}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="table-responsive">
+  <table class="table table-hover table-sm align-middle">
+    <thead>
+      <tr>
+        <th>CPF</th>
+        <th>Cliente</th>
+        <th>Contrato</th>
+        <th>Tipo</th>
+        <th class="text-end">Valor</th>
+        <th class="text-end">Pago</th>
+        <th class="text-center" style="width:240px;">Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in contratos %}
+        <tr>
+          <td>{{ c.cpf }}</td>
+          <td>{{ c.cliente }}</td>
+          <td>{{ c.numero }}</td>
+          <td>{{ c.tipo_contrato }}</td>
+          <td class="text-end">{{ '%.2f'|format(c.valor or 0) }}</td>
+          <td class="text-end">{{ '%.2f'|format(c.valor_pago or 0) }}</td>
+          <td class="text-center">
+            <a href="{{ url_for('parcelas', id=c.id) }}" class="btn btn-primary btn-sm">Parcelas</a>
+            <a href="{{ url_for('info', id=c.id) }}" class="btn btn-secondary btn-sm">Info</a>
+            <form action="{{ url_for('delete', id=c.id) }}" method="post" style="display:inline-block" onsubmit="return confirm('Excluir este contrato?');">
+              <button class="btn btn-danger btn-sm">Excluir</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+</body>
+</html>

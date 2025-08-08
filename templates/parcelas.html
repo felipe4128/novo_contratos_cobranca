@@ -1,31 +1,44 @@
 <!doctype html>
 <html lang="pt-br">
-<head><meta charset="utf-8"><title>Parcelas</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head>
-<body class="p-4">
-<h1>Parcelas - Contrato {{ contrato.numero }}</h1>
-<table class="table">
-<thead>
-<tr><th>#</th><th>Vencimento</th><th>Valor</th><th>Baixa</th></tr>
-</thead>
-<tbody>
-{% for p in parcels %}
-<tr>
-<td>{{ p.numero }}</td>
-<td>{{ p.due_date.strftime('%d/%m/%Y') }}</td>
-<td>{{ p.value }}</td>
-<td>
-  {% if p.baixa %}
-    <span class="text-success">Baixada em {{ p.data_baixa.strftime('%d/%m/%Y') }}</span>
-  {% else %}
-    <form action="{{ url_for('baixar_parcela', contrato_id=contrato.id, parcela_id=p.id) }}" method="post">
-      <button class="btn btn-sm btn-primary">Dar Baixa</button>
-    </form>
-  {% endif %}
-</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
-<a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
-</body></html>
+<head>
+  <meta charset="utf-8">
+  <title>Parcelas - Contrato {{ c.numero }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+  <h3>Parcelas - Contrato {{ c.numero }}</h3>
+  <a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm mb-3">Voltar</a>
+  <div class="table-responsive">
+  <table class="table table-striped table-sm align-middle">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Vencimento</th>
+        <th class="text-end">Valor</th>
+        <th>Baixa</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for p in parcelas %}
+      <tr>
+        <td>{{ p.numero }}</td>
+        <td>{{ to_br_date(p.vencimento) }}</td>
+        <td class="text-end">{{ '%.2f'|format(p.valor or 0) }}</td>
+        <td>
+          {% if p.baixada_em %}
+            Baixada em {{ to_br_date(p.baixada_em) }}
+          {% else %}
+            <form action="{{ url_for('baixar_parcela', contrato_id=c.id, parcela_id=p.id) }}" method="post">
+              <button class="btn btn-primary btn-sm">Dar Baixa</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+</body>
+</html>
