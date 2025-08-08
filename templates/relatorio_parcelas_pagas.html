@@ -1,58 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Relatório – Parcelas Pagas</h3>
 
-<!doctype html>
-<html lang="pt-br">
-<head>
-<meta charset="utf-8">
-<title>Relatório - Parcelas Pagas</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-<div class="container py-3">
-  <h3>Relatório de Parcelas Pagas</h3>
-  <form method="post" class="row g-2 mb-3">
-    <div class="col-md-3">
-      <label class="form-label">De</label>
-      <input name="inicio" class="form-control" placeholder="dd/mm/aaaa" value="{{ inicio|br_date }}">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Até</label>
-      <input name="fim" class="form-control" placeholder="dd/mm/aaaa" value="{{ fim|br_date }}">
-    </div>
-    <div class="col-12">
-      <button class="btn btn-primary">Filtrar</button>
-      <button name="exportar" value="1" class="btn btn-success">Exportar Excel</button>
-      <a class="btn btn-outline-secondary" href="{{ url_for('index') }}">Voltar</a>
-    </div>
-  </form>
-
-  {% if resultados %}
-    <table class="table table-sm table-hover align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>Contrato</th><th>Cliente</th><th>CPF</th><th>Parcela</th><th>Vencimento</th><th>Pago em</th><th>Valor</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for p in resultados %}
-        <tr>
-          <td>{{ p.contrato.numero }}</td>
-          <td>{{ p.contrato.cliente }}</td>
-          <td>{{ p.contrato.cpf }}</td>
-          <td>{{ p.numero }}</td>
-          <td>{{ p.vencimento|br_date }}</td>
-          <td>{{ p.baixada_em|br_date }}</td>
-          <td>{{ "%.2f"|format(p.valor or 0) }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr class="table-secondary">
-          <th colspan="6" class="text-end">Total</th>
-          <th>{{ "%.2f"|format(total or 0) }}</th>
-        </tr>
-      </tfoot>
-    </table>
+<form method="post" class="row g-2 mb-3">
+  <div class="col-auto">
+    <label class="form-label">Início</label>
+    <input type="date" name="inicio" class="form-control" value="{{ inicio or '' }}">
+  </div>
+  <div class="col-auto">
+    <label class="form-label">Fim</label>
+    <input type="date" name="fim" class="form-control" value="{{ fim or '' }}">
+  </div>
+  <div class="col-auto align-self-end">
+    <button class="btn btn-primary">Gerar</button>
+  </div>
+  {% if resultados and inicio and fim %}
+  <div class="col-auto align-self-end">
+    <a class="btn btn-success"
+       href="{{ url_for('exportar_relatorio_parcelas_pagas', inicio=inicio, fim=fim) }}">Exportar Excel</a>
+  </div>
   {% endif %}
-</div>
-</body>
-</html>
+</form>
+
+<table class="table table-sm table-striped">
+  <thead>
+    <tr>
+      <th>Data Baixa</th>
+      <th>Cliente</th>
+      <th>Contrato</th>
+      <th>Parcela</th>
+      <th class="text-end">Valor</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in resultados %}
+    <tr>
+      <td>{{ r.baixada_em.strftime('%d/%m/%Y') if r.baixada_em else '' }}</td>
+      <td>{{ r.cliente }}</td>
+      <td>{{ r.contrato_num }}</td>
+      <td>{{ r.parcela_num }}</td>
+      <td class="text-end">{{ 'R$ {:,.2f}'.format(r.valor or 0).replace(',', 'X').replace('.', ',').replace('X', '.') }}</td>
+    </tr>
+    {% endfor %}
+    {% if not resultados %}
+    <tr><td colspan="5" class="text-center text-muted">Informe um período e gere o relatório.</td></tr>
+    {% endif %}
+  </tbody>
+  {% if resultados %}
+  <tfoot>
+    <tr>
+      <th colspan="4" class="text-end">Total</th>
+      <th class="text-end">{{ 'R$ {:,.2f}'.format(total or 0).replace(',', 'X').replace('.', ',').replace('X', '.') }}</th>
+    </tr>
+  </tfoot>
+  {% endif %}
+</table>
+{% endblock %}
