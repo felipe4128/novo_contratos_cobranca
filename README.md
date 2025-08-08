@@ -1,13 +1,15 @@
-# Contratos Cobrança (com relatório de parcelas pagas)
 
-## Como rodar local
-```
+# Contratos Cobrança (corrigido)
+
+- Relacionamento `Contrato` <-> `Parcela` usando **back_populates** (evita o erro de backref duplicado).
+- Gera parcelas a partir do 1º vencimento e valor da parcela.
+- Baixa de parcela que atualiza `valor_pago` e `parcelas_restantes`.
+- Relatório de parcelas pagas por período + exportação para Excel.
+- Exportação de todos os contratos (todos os campos) para Excel.
+
+## Rodar
+```bash
 pip install -r requirements.txt
 python app.py
+# abra http://127.0.0.1:5000
 ```
-Acesse http://127.0.0.1:5000
-
-## Render
-Use como Start Command:
-- Flask CLI: `flask run --host=0.0.0.0 --port $PORT`
-- Ou Gunicorn: `gunicorn app:app --bind 0.0.0.0:$PORT`

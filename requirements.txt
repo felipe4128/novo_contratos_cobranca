@@ -1,5 +1,4 @@
-Flask
-Flask_SQLAlchemy
-pandas
-XlsxWriter
-python-dateutil
+Flask==3.1.1
+Flask_SQLAlchemy==3.1.1
+pandas==2.3.1
+XlsxWriter==3.2.5

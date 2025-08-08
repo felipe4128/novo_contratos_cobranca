@@ -1,58 +1,66 @@
+
 <!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <title>Info do Contrato</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="utf-8">
+<title>Info Contrato</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-<div class="container mt-4">
+<body class="bg-light">
+<div class="container py-3">
   <h3>Info: Contrato {{ c.numero }}</h3>
-  <form method="post" class="row g-3">
+  <form method="post" class="row g-2">
     <div class="col-md-3">
       <label class="form-label">CPF</label>
-      <input name="cpf" value="{{ c.cpf or '' }}" class="form-control">
+      <input name="cpf" class="form-control" value="{{ c.cpf or '' }}">
     </div>
     <div class="col-md-6">
       <label class="form-label">Cliente</label>
-      <input name="cliente" value="{{ c.cliente or '' }}" class="form-control">
+      <input name="cliente" class="form-control" value="{{ c.cliente or '' }}">
     </div>
     <div class="col-md-3">
-      <label class="form-label">Número</label>
-      <input name="numero" value="{{ c.numero or '' }}" class="form-control">
+      <label class="form-label">Contrato</label>
+      <input name="numero" class="form-control" value="{{ c.numero or '' }}">
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Tipo</label>
-      <input name="tipo_contrato" value="{{ c.tipo_contrato or '' }}" class="form-control">
+      <input name="tipo_contrato" class="form-control" value="{{ c.tipo_contrato or '' }}">
     </div>
     <div class="col-md-3">
+      <label class="form-label">Cooperado</label>
+      <input name="cooperado" class="form-control" value="{{ c.cooperado or '' }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Garantia</label>
+      <input name="garantia" class="form-control" value="{{ c.garantia or '' }}">
+    </div>
+
+    <div class="col-md-2">
       <label class="form-label">Valor</label>
-      <input name="valor" value="{{ c.valor or '' }}" class="form-control">
+      <input name="valor" class="form-control" value="{{ c.valor or '' }}">
     </div>
-    <div class="col-md-3">
-      <label class="form-label">Valor Pago</label>
-      <input name="valor_pago" value="{{ c.valor_pago or '' }}" class="form-control">
+    <div class="col-md-2">
+      <label class="form-label">Valor no Sistema</label>
+      <input name="valor_contrato_sistema" class="form-control" value="{{ c.valor_contrato_sistema or '' }}">
     </div>
-    <div class="col-md-3">
+
+    <div class="col-md-2">
+      <label class="form-label">Valor Parcela</label>
+      <input name="valor_das_parcelas" class="form-control" value="{{ c.valor_das_parcelas or '' }}">
+    </div>
+    <div class="col-md-2">
       <label class="form-label">Parcelas</label>
-      <input name="parcelas" value="{{ c.parcelas or 0 }}" class="form-control">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Parcelas Restantes</label>
-      <input name="parcelas_restantes" value="{{ c.parcelas_restantes or 0 }}" class="form-control">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label">Valor da Parcela</label>
-      <input name="valor_das_parcelas" value="{{ c.valor_das_parcelas or '' }}" class="form-control">
+      <input name="parcelas" class="form-control" value="{{ c.parcelas or '' }}">
     </div>
     <div class="col-md-3">
       <label class="form-label">1º Venc. Parcela</label>
-      <input name="vencimento_parcelas" value="{{ to_br_date(c.vencimento_parcelas) }}" class="form-control" placeholder="dd/mm/aaaa">
+      <input name="vencimento_parcelas" class="form-control" value="{{ c.vencimento_parcelas|br_date }}">
     </div>
 
-    <div class="col-12">
+    <div class="col-12 mt-3">
+      <button name="voltar" value="1" class="btn btn-outline-secondary">Voltar</button>
       <button class="btn btn-success">Salvar</button>
-      <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
     </div>
   </form>
 </div>
