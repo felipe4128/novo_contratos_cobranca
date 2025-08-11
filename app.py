@@ -318,6 +318,23 @@ def info_alias(id):
 # --- fim alias ---
 
 
+
+
+# --- Excluir contrato ---
+@app.post('/contrato/<int:id>/excluir', endpoint='excluir')
+def excluir(id):
+    c = Contrato.query.get_or_404(id)
+    # Tenta remover parcelas vinculadas, se não houver cascade configurado
+    try:
+        Parcela.query.filter_by(contrato_id=id).delete()
+    except Exception:
+        pass
+    db.session.delete(c)
+    db.session.commit()
+    return redirect(url_for('index'))
+# --- fim excluir ---
+
+
 if __name__ == '__main__':
     # create tables on startup
     with app.app_context():
