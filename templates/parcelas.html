@@ -49,7 +49,7 @@
       <tr>
         <td>{{ p.numero or loop.index }}</td>
         <td>{{ p.vencimento|fmtdate }}</td>
-        <td>R$ {{ valor_parc|brl }}</td>
+        <td>R$ {{ (p._valor_render if hasattr(p, '_valor_render') else 0)|brl }}</td>
         <td>
           {% if data_baixa %}
             Baixada em {{ data_baixa|fmtdate }}

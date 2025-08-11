@@ -258,6 +258,7 @@ def ver_parcelas(id):
     c = Contrato.query.get_or_404(id)
     parcels = Parcela.query.filter_by(contrato_id=id).order_by(Parcela.numero.asc()).all()
 
+    # resumo (mesmos fallbacks de antes)
     def _get(o, *names, default=0):
         for n in names:
             if hasattr(o, n) and getattr(o, n) is not None:
@@ -278,6 +279,30 @@ def ver_parcelas(id):
         "alvara_recebido":     _get(c, "alvara_recebido"),
         "ganho":               _get(c, "ganho"),
     }
+
+    # ---- NOVO: tentar achar o valor de cada parcela com vários nomes; se não houver, deduzir ----
+    total = resumo["valor"]
+    qtd = _get(c, "parcelas", "qtd_parcelas", default=len(parcels) or 1)
+    fallback_valor = (total / qtd) if (total and qtd) else 0
+
+    for p in parcels:
+        valor = None
+        for name in ("valor", "valor_parcela", "valor_total", "vlr", "valor_previsto"):
+            if hasattr(p, name) and getattr(p, name) not in (None, ""):
+                try:
+                    valor = float(getattr(p, name))
+                    break
+                except Exception:
+                    # se vier como string '500,00', tenta trocar vírgula por ponto
+                    try:
+                        valor = float(str(getattr(p, name)).replace(",", ".").strip())
+                        break
+                    except Exception:
+                        pass
+        if valor is None:
+            valor = fallback_valor
+        # atributo auxiliar apenas para render
+        setattr(p, "_valor_render", valor)
 
     return render_template(
         'parcelas.html',
