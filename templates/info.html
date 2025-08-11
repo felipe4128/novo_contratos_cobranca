@@ -1,118 +1,15 @@
-<!doctype html>
-<html lang="pt-br">
-<head>
-  <meta charset="utf-8">
-  <title>Info Contrato</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-  <div class="container mt-4">
-    <h1>Info Contrato</h1>
-    <form method="post">
-      <label>CPF</label>
-      <input class="form-control" name="cpf" value="{{ contrato.cpf }}">
-
-      <label>Cliente</label>
-      <input class="form-control" name="cliente" value="{{ contrato.cliente }}">
-
-      <label>Número Contrato</label>
-      <input class="form-control" name="numero" value="{{ contrato.numero }}">
-
-      <label>Tipo Contrato</label>
-      <input class="form-control" name="tipo_contrato" value="{{ contrato.tipo_contrato }}">
-
-      <label>Cooperado</label>
-      <input class="form-control" name="cooperado" value="{{ contrato.cooperado }}">
-
-      <label>Garantia</label>
-      <input class="form-control" name="garantia" value="{{ contrato.garantia }}">
-
-      <label>Valor</label>
-      <input type="number" step="0.01" class="form-control" name="valor" value="{{ contrato.valor }}">
-
-      <label>Valor Pago</label>
-      <input type="number" step="0.01" class="form-control" name="valor_pago" value="{{ contrato.valor_pago }}">
-
-      <label>Valor no Sistema</label>
-      <input type="number" step="0.01" class="form-control" name="valor_contrato_sistema" value="{{ contrato.valor_contrato_sistema }}">
-
-      <div class="form-check">
-        <input type="checkbox" class="form-check-input" name="baixa_acima_48_meses" {% if contrato.baixa_acima_48_meses %}checked{% endif %}>
-        <label class="form-check-label">Baixa &gt;48m</label>
-      </div>
-
-      <label>Valor Abatido</label>
-      <input type="number" step="0.01" class="form-control" name="valor_abatido" value="{{ contrato.valor_abatido }}">
-
-      <label>Ganho</label>
-      <input type="number" step="0.01" class="form-control" name="ganho" value="{{ contrato.ganho }}">
-
-      <label>Custas</label>
-      <input type="number" step="0.01" class="form-control" name="custas" value="{{ contrato.custas }}">
-
-      <label>Custas Deduzidas</label>
-      <input type="number" step="0.01" class="form-control" name="custas_deduzidas" value="{{ contrato.custas_deduzidas }}">
-
-      <label>Protesto</label>
-      <input type="number" step="0.01" class="form-control" name="protesto" value="{{ contrato.protesto }}">
-
-      <label>Protesto Deduzido</label>
-      <input type="number" step="0.01" class="form-control" name="protesto_deduzido" value="{{ contrato.protesto_deduzido }}">
-
-      <label>Honorário</label>
-      <input type="number" step="0.01" class="form-control" name="honorario" value="{{ contrato.honorario }}">
-
-      <label>Honorário Repassado</label>
-      <input type="number" step="0.01" class="form-control" name="honorario_repassado" value="{{ contrato.honorario_repassado }}">
-
-      <label>Alvará</label>
-      <input type="number" step="0.01" class="form-control" name="alvara" value="{{ contrato.alvara }}">
-
-      <label>Alvará Recebido</label>
-      <input type="number" step="0.01" class="form-control" name="alvara_recebido" value="{{ contrato.alvara_recebido }}">
-
-      <label>Valor Entrada</label>
-      <input type="number" step="0.01" class="form-control" name="valor_entrada" value="{{ contrato.valor_entrada }}">
-
-      <label>Vencimento Entrada</label>
-      <input type="date" class="form-control" name="vencimento_entrada" value="{{ contrato.vencimento_entrada }}">
-
-      <label>Valor das Parcelas</label>
-      <input type="number" step="0.01" class="form-control" name="valor_das_parcelas" value="{{ contrato.valor_das_parcelas }}">
-
-      <label>Parcelas</label>
-      <input type="number" class="form-control" name="parcelas" value="{{ contrato.parcelas }}">
-
-      <label>Parcelas Restantes</label>
-      <input type="number" class="form-control" name="parcelas_restantes" value="{{ contrato.parcelas_restantes }}">
-
-      <label>Vencimento Parcelas</label>
-      <input type="date" class="form-control" name="vencimento_parcelas" value="{{ contrato.vencimento_parcelas }}">
-
-      <label>Qtde Boletos Emitidos</label>
-      <input type="number" class="form-control" name="quantidade_boletos_emitidos" value="{{ contrato.quantidade_boletos_emitidos }}">
-
-      <label>Valor Pg Boleto</label>
-      <input type="number" step="0.01" class="form-control" name="valor_pg_com_boleto" value="{{ contrato.valor_pg_com_boleto }}">
-
-      <label>Data Pg Boleto</label>
-      <input type="date" class="form-control" name="data_pg_boleto" value="{{ contrato.data_pg_boleto }}">
-
-      <label>Data Baixa</label>
-      <input type="date" class="form-control" name="data_baixa" value="{{ contrato.data_baixa }}">
-
-      <label>Obs Contabilidade</label>
-      <textarea class="form-control" name="obs_contabilidade">{{ contrato.obs_contabilidade }}</textarea>
-
-      <label>Obs Contas Receber</label>
-      <textarea class="form-control" name="obs_contas_receber">{{ contrato.obs_contas_receber }}</textarea>
-
-      <label>Valor Repassar Escritório</label>
-      <input type="number" step="0.01" class="form-control" name="valor_repassar_escritorio" value="{{ contrato.valor_repassar_escritorio }}">
-
-      <button class="btn btn-success mt-3">Salvar</button>
-      <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3 ms-2">Voltar</a>
-    </form>
+{% extends "base.html" %}
+{% block content %}
+<div class="bg-white p-3 rounded shadow-sm">
+  <h5>Informações do Contrato</h5>
+  <div class="row g-2">
+    <div class="col-md-3"><strong>CPF:</strong> {{ c.cpf }}</div>
+    <div class="col-md-3"><strong>Cliente:</strong> {{ c.cliente }}</div>
+    <div class="col-md-2"><strong>Contrato:</strong> {{ c.contrato }}</div>
+    <div class="col-md-2"><strong>Tipo:</strong> {{ c.tipo }}</div>
+    <div class="col-md-2"><strong>Criado em:</strong> {{ c.created_at|data }}</div>
   </div>
-</body>
-</html>
+  <hr>
+  <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">Voltar</a>
+</div>
+{% endblock %}
