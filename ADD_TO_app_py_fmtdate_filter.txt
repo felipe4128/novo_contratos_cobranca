@@ -1,0 +1,21 @@
+# --- Filtro seguro para datas: usa em {{ valor|fmtdate }} ---
+from datetime import datetime, date
+
+@app.template_filter('fmtdate')
+def fmtdate(value):
+    if not value:
+        return ""
+    try:
+        if isinstance(value, (datetime, date)):
+            return value.strftime("%d/%m/%Y")
+        s = str(value).strip()
+        # tenta formatos comuns
+        for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
+            try:
+                return datetime.strptime(s[:19], fmt).strftime("%d/%m/%Y")
+            except Exception:
+                pass
+        return s  # se não reconheceu, devolve como texto
+    except Exception:
+        return str(value)
+# --- fim filtro ---

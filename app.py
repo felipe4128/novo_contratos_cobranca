@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 from io import BytesIO
@@ -20,6 +20,25 @@ app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+
+@app.template_filter('fmtdate')
+def fmtdate(value):
+    if not value:
+        return ""
+    try:
+        if isinstance(value, (datetime, date)):
+            return value.strftime("%d/%m/%Y")
+        s = str(value).strip()
+        for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
+            try:
+                return datetime.strptime(s[:19], fmt).strftime("%d/%m/%Y")
+            except Exception:
+                pass
+        return s
+    except Exception:
+        return str(value)
+
 
 
 # Helper para tratar datas ISO (YYYY-MM-DD)
@@ -231,14 +250,8 @@ def delete(id):
     db.session.commit()
     return redirect(url_for('index'))
 
-if __name__ == '__main__':
-    # create tables on startup
-    with app.app_context():
-        db.create_all()
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
 
 
-# Rotas de parcelas (inclui alias para url_for('parcelas', id=...))
 @app.route('/contrato/<int:id>/parcelas')
 @app.route('/parcelas/<int:id>', endpoint='parcelas')
 def ver_parcelas(id):
@@ -266,5 +279,21 @@ def ver_parcelas(id):
         "ganho":               _get(c, "ganho"),
     }
 
-    return render_template('parcelas.html', contrato=c, parcelas=parcels, resumo=resumo)
+    return render_template(
+        'parcelas.html',
+        contrato=c,
+        parcelas=parcels,
+        parcels=parcels,
+        resumo=resumo
+    )
+
+
+if __name__ == '__main__':
+    # create tables on startup
+    with app.app_context():
+        db.create_all()
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
+
+
+# Rotas de parcelas (inclui alias para url_for('parcelas', id=...))
 
