@@ -254,9 +254,99 @@ def delete(id):
 
 @app.route('/contrato/<int:id>/parcelas')
 @app.route('/parcelas/<int:id>', endpoint='parcelas')
+
+
+# ==== Helpers para geração automática de parcelas ====
+def _first_due_date(c):
+    for name in ('vencimento_entrada', 'primeiro_vencimento', 'vencimento', 'data_primeira_parcela', 'dt_primeira'):
+        if hasattr(c, name):
+            val = getattr(c, name)
+            if val:
+                # normaliza para date
+                if isinstance(val, date):
+                    return val
+                if isinstance(val, datetime):
+                    return val.date()
+                if isinstance(val, str):
+                    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%Y/%m/%d", "%d-%m-%Y"):
+                        try:
+                            return datetime.strptime(val.strip(), fmt).date()
+                        except Exception:
+                            pass
+    return None
+
+def _get_int(o, *names, default=0):
+    for n in names:
+        if hasattr(o, n):
+            v = getattr(o, n)
+            if v not in (None, ""):
+                try:
+                    return int(v)
+                except Exception:
+                    try:
+                        return int(float(str(v).replace(",", ".").strip()))
+                    except Exception:
+                        pass
+    return default
+
+def _get_float(o, *names, default=0.0):
+    for n in names:
+        if hasattr(o, n):
+            v = getattr(o, n)
+            if v not in (None, ""):
+                try:
+                    return float(v)
+                except Exception:
+                    try:
+                        return float(str(v).replace(",", ".").strip())
+                    except Exception:
+                        pass
+    return default
+
+def ensure_parcelas(c):
+    """Se o contrato não tiver parcelas no banco, cria automaticamente
+    a partir do total, quantidade e primeira data de vencimento.
+    """
+    try:
+        count = Parcela.query.filter_by(contrato_id=c.id).count()
+    except Exception:
+        count = 0
+
+    if count:
+        return []  # já tem, não cria
+
+    qtd = _get_int(c, 'parcelas', 'qtd_parcelas', 'num_parcelas', default=0)
+    total = _get_float(c, 'valor', 'valor_total', default=0.0)
+    first_due = _first_due_date(c)
+
+    if not (qtd and total and first_due):
+        return []  # faltam dados para criar
+
+    # valor igual por parcela, com ajuste no último centavo
+    base = round(total / qtd, 2)
+    vals = [base] * qtd
+    ajuste = round(total - sum(vals), 2)
+    if ajuste != 0:
+        vals[-1] = round(vals[-1] + ajuste, 2)
+
+    created = []
+    for i in range(qtd):
+        venc = first_due + relativedelta(months=i)
+        p = Parcela(contrato_id=c.id, numero=i+1, vencimento=venc, valor=vals[i])
+        db.session.add(p)
+        created.append(p)
+    db.session.commit()
+    return created
+# ==== fim helpers ====
+
+
 def ver_parcelas(id):
     c = Contrato.query.get_or_404(id)
     parcels = Parcela.query.filter_by(contrato_id=id).order_by(Parcela.numero.asc()).all()
+    if not parcels:
+        created = ensure_parcelas(c)
+        if created:
+            parcels = created
 
     # resumo (mesmos fallbacks de antes)
     def _get(o, *names, default=0):
