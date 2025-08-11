@@ -308,6 +308,16 @@ def baixar_parcela(contrato_id, parcela_id):
 # --- fim baixar parcela ---
 
 
+
+
+# --- Alias de rota: 'info' -> 'editar_info' ---
+@app.route('/contrato/<int:id>/info', endpoint='info')
+def info_alias(id):
+    # Se sua função real de edição for 'editar_info', mantemos compatibilidade
+    return redirect(url_for('editar_info', id=id))
+# --- fim alias ---
+
+
 if __name__ == '__main__':
     # create tables on startup
     with app.app_context():
