@@ -40,14 +40,21 @@
   <tbody>
     {% set lista = parcelas if parcelas is defined else parcels %}
     {% for p in lista %}
-      {% set data_baixa = p.baixa or p.baixado_em or p.pago_em %}
+      {# valor da parcela com fallbacks #}
+      {% set valor_parc = (p.valor if p.valor is not none else (p.valor_parcela if p.valor_parcela is not none else (p.valor_total if p.valor_total is not none else 0))) %}
+      {# pega data de baixa se existir #}
+      {% set data_baixa = p.data_baixa or p.baixa_data or p.baixado_em or p.pago_em %}
+      {# pega flags booleanas de baixa #}
+      {% set flag_baixa = p.baixa or p.pago or p.baixada or p.liquidada %}
       <tr>
         <td>{{ p.numero or loop.index }}</td>
         <td>{{ p.vencimento|fmtdate }}</td>
-        <td>R$ {{ p.valor|brl }}</td>
+        <td>R$ {{ valor_parc|brl }}</td>
         <td>
           {% if data_baixa %}
             Baixada em {{ data_baixa|fmtdate }}
+          {% elif flag_baixa %}
+            Baixada
           {% else %}
             <form action="{{ url_for('baixar_parcela', contrato_id=contrato.id, parcela_id=p.id) }}" method="post" style="display:inline">
               <button class="btn btn-primary btn-sm">Dar Baixa</button>

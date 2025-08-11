@@ -4,19 +4,38 @@
 <table class="table table-sm">
   <thead>
     <tr>
-      <th>CPF</th><th>Cliente</th><th>Contrato</th><th>Ações</th>
+      <th>CPF</th>
+      <th>Cliente</th>
+      <th>Contrato</th>
+      <th>Tipo</th>
+      <th>Valor</th>
+      <th>Pago</th>
+      <th>Parcelas</th>
+      <th>Info</th>
+      <th>Excluir</th>
     </tr>
   </thead>
   <tbody>
     {% for c in contratos %}
-    <tr>
-      <td>{{ c.cpf }}</td>
-      <td>{{ c.cliente }}</td>
-      <td>{{ c.contrato or c.numero or c.id }}</td>
-      <td>
-        <a href="{{ url_for('ver_parcelas', id=c.id) }}" class="btn btn-primary btn-sm">Parcelas</a>
-      </td>
-    </tr>
+      <tr>
+        <td>{{ c.cpf }}</td>
+        <td>{{ c.cliente }}</td>
+        <td>{{ c.contrato or c.numero or c.id }}</td>
+        <td>{{ c.tipo or c.tipo_contrato }}</td>
+        <td>R$ {{ (c.valor or c.valor_total or 0)|brl }}</td>
+        <td>R$ {{ (c.pago or c.valor_pago or 0)|brl }}</td>
+        <td>
+          <a href="{{ url_for('ver_parcelas', id=c.id) }}" class="btn btn-primary btn-sm">Parcelas</a>
+        </td>
+        <td>
+          <a href="{{ url_for('info', id=c.id) }}" class="btn btn-secondary btn-sm">Info</a>
+        </td>
+        <td>
+          <form action="{{ url_for('excluir', id=c.id) }}" method="post" style="display:inline" onsubmit="return confirm('Excluir este contrato?');">
+            <button class="btn btn-danger btn-sm">Excluir</button>
+          </form>
+        </td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>
