@@ -1,9 +1,6 @@
-<!doctype html>
-<html lang="pt-br">
-<head><meta charset="utf-8"><title>Parcelas</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head>
-<body class="p-4">
-\1
+{% extends "base.html" %}
+{% block content %}
+<h1>Parcelas - Contrato {{ contrato.contrato or contrato.numero or contrato.id }}</h1>
 
 <div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
   {% macro card(label, val) -%}
@@ -31,29 +28,40 @@
   {{ card('Ganho', resumo.ganho) }}
 </div>
 
-
-<table class="table">
-<thead>
-<tr><th>#</th><th>Vencimento</th><th>Valor</th><th>Baixa</th></tr>
-</thead>
-<tbody>
-{% for p in parcels %}
-<tr>
-<td>{{ p.numero }}</td>
-<td>{{ p.due_date.strftime('%d/%m/%Y') }}</td>
-<td>{{ p.value }}</td>
-<td>
-  {% if p.baixa %}
-    <span class="text-success">Baixada em {{ p.data_baixa.strftime('%d/%m/%Y') }}</span>
-  {% else %}
-    <form action="{{ url_for('baixar_parcela', contrato_id=contrato.id, parcela_id=p.id) }}" method="post">
-      <button class="btn btn-sm btn-primary">Dar Baixa</button>
-    </form>
-  {% endif %}
-</td>
-</tr>
-{% endfor %}
-</tbody>
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Vencimento</th>
+      <th>Valor</th>
+      <th>Baixa</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% set lista = parcelas if parcelas is defined else parcels %}
+    {% for p in lista %}
+      {% set data_baixa = p.baixa or p.baixado_em or p.pago_em %}
+      <tr>
+        <td>{{ p.numero or loop.index }}</td>
+        <td>{{ p.vencimento|fmtdate if 'fmtdate' in globals() else (p.vencimento.strftime('%d/%m/%Y') if p.vencimento) }}</td>
+        <td>R$ {{ p.valor|brl }}</td>
+        <td>
+          {% if data_baixa %}
+            {% if 'fmtdate' in globals() %}
+              Baixada em {{ data_baixa|fmtdate }}
+            {% else %}
+              Baixada
+            {% endif %}
+          {% else %}
+            <form action="{{ url_for('baixar_parcela', contrato_id=contrato.id, parcela_id=p.id) }}" method="post" style="display:inline">
+              <button class="btn btn-primary btn-sm">Dar Baixa</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
 </table>
-<a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
-</body></html>
+
+<a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm">Voltar</a>
+{% endblock %}

@@ -1,0 +1,20 @@
+# --- ROTA para dar baixa em parcela (coloque ANTES do app.run) ---
+from datetime import date
+from flask import redirect, url_for
+
+@app.post('/contrato/<int:contrato_id>/parcela/<int:parcela_id>/baixar', endpoint='baixar_parcela')
+def baixar_parcela(contrato_id, parcela_id):
+    p = Parcela.query.filter_by(id=parcela_id, contrato_id=contrato_id).first_or_404()
+
+    hoje = date.today()
+    # Marca a baixa no primeiro campo existente
+    if hasattr(p, 'baixa'):
+        p.baixa = hoje
+    elif hasattr(p, 'baixado_em'):
+        p.baixado_em = hoje
+    elif hasattr(p, 'pago_em'):
+        p.pago_em = hoje
+
+    db.session.commit()
+    return redirect(url_for('ver_parcelas', id=contrato_id))
+# --- fim rota ---
