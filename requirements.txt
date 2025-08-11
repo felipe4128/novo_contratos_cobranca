@@ -3,3 +3,4 @@ Flask_SQLAlchemy
 pandas
 XlsxWriter
 python-dateutil
+psycopg2-binary

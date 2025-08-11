@@ -7,9 +7,39 @@ from io import BytesIO
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///credito.db'
+
+# Banco: DATABASE_URL (Postgres no Render). Sem ela, usa SQLite na pasta instance/ (dev).
+uri = os.getenv("DATABASE_URL", "").strip()
+if uri:
+    if uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql+psycopg2://", 1)
+else:
+    os.makedirs(app.instance_path, exist_ok=True)
+    uri = f"sqlite:///{os.path.join(app.instance_path, 'credito.db')}"
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
+
+
+# Helper para tratar datas ISO (YYYY-MM-DD)
+def parse_iso_date(value):
+    if not value:
+        return None
+    value = str(value).strip()[:10]
+    try:
+        return datetime.strptime(value, '%Y-%m-%d').date()
+    except ValueError:
+        return None
+
+
+@app.template_filter('brl')
+def brl(value):
+    try:
+        return f"{float(value or 0):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except Exception:
+        return "0,00"
+
 
 class Contrato(db.Model):
     # existing fields
@@ -91,15 +121,15 @@ def novo():
             alvara=float(request.form.get('alvara')) if request.form.get('alvara') else None,
             alvara_recebido=float(request.form.get('alvara_recebido')) if request.form.get('alvara_recebido') else None,
             valor_entrada=float(request.form.get('valor_entrada')) if request.form.get('valor_entrada') else None,
-            vencimento_entrada=datetime.strptime(request.form.get('vencimento_entrada'), '%Y-%m-%d') if request.form.get('vencimento_entrada') else None,
+            vencimento_entrada=parse_iso_date(request.form.get('vencimento_entrada')) if request.form.get('vencimento_entrada') else None,
             valor_das_parcelas=float(request.form.get('valor_das_parcelas')) if request.form.get('valor_das_parcelas') else None,
             parcelas=int(request.form.get('parcelas')) if request.form.get('parcelas') else 0,
             parcelas_restantes=int(request.form.get('parcelas_restantes')) if request.form.get('parcelas_restantes') else 0,
-            vencimento_parcelas=datetime.strptime(request.form.get('vencimento_parcelas'), '%Y-%m-%d') if request.form.get('vencimento_parcelas') else None,
+            vencimento_parcelas=parse_iso_date(request.form.get('vencimento_parcelas')) if request.form.get('vencimento_parcelas') else None,
             quantidade_boletos_emitidos=int(request.form.get('quantidade_boletos_emitidos')) if request.form.get('quantidade_boletos_emitidos') else None,
             valor_pg_com_boleto=float(request.form.get('valor_pg_com_boleto')) if request.form.get('valor_pg_com_boleto') else None,
-            data_pg_boleto=datetime.strptime(request.form.get('data_pg_boleto'), '%Y-%m-%d') if request.form.get('data_pg_boleto') else None,
-            data_baixa=datetime.strptime(request.form.get('data_baixa'), '%Y-%m-%d') if request.form.get('data_baixa') else None,
+            data_pg_boleto=parse_iso_date(request.form.get('data_pg_boleto')) if request.form.get('data_pg_boleto') else None,
+            data_baixa=parse_iso_date(request.form.get('data_baixa')) if request.form.get('data_baixa') else None,
             obs_contabilidade=request.form.get('obs_contabilidade'),
             obs_contas_receber=request.form.get('obs_contas_receber'),
             valor_repassar_escritorio=float(request.form.get('valor_repassar_escritorio')) if request.form.get('valor_repassar_escritorio') else None
@@ -143,31 +173,7 @@ def editar_info(id):
     return render_template('info.html', contrato=c)
 
 
-@app.route('/parcelas/<int:id>')
-def parcelas(id):
-    c = Contrato.query.get_or_404(id)
-    # generate parcelas if not exist
-    if not Parcela.query.filter_by(contrato_id=c.id).first():
-        first_due = c.vencimento_parcelas or c.vencimento_entrada
-        if first_due and c.parcelas and c.valor_das_parcelas:
-            for i in range(c.parcelas):
-                due = first_due + relativedelta(months=i)
-                p = Parcela(contrato_id=c.id, numero=i+1, due_date=due, value=c.valor_das_parcelas)
-                db.session.add(p)
-            db.session.commit()
-    parcels = Parcela.query.filter_by(contrato_id=c.id).order_by(Parcela.numero).all()
-    return render_template('parcelas.html', contrato=c, parcels=parcels)
 
-@app.route('/parcelas/<int:contrato_id>/baixar/<int:parcela_id>', methods=['POST'])
-def baixar_parcela(contrato_id, parcela_id):
-    p = Parcela.query.get_or_404(parcela_id)
-    p.baixa = True
-    p.data_baixa = datetime.today().date()
-    # update valor_pago
-    c = p.contrato
-    c.valor_pago = (c.valor_pago or 0) + p.value
-    db.session.commit()
-    return redirect(url_for('parcelas', id=contrato_id))
 
 @app.route('/exportar')
 def exportar():
@@ -230,3 +236,35 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
+
+
+# Rotas de parcelas (inclui alias para url_for('parcelas', id=...))
+@app.route('/contrato/<int:id>/parcelas')
+@app.route('/parcelas/<int:id>', endpoint='parcelas')
+def ver_parcelas(id):
+    c = Contrato.query.get_or_404(id)
+    parcels = Parcela.query.filter_by(contrato_id=id).order_by(Parcela.numero.asc()).all()
+
+    def _get(o, *names, default=0):
+        for n in names:
+            if hasattr(o, n) and getattr(o, n) is not None:
+                return getattr(o, n)
+        return default
+
+    resumo = {
+        "valor":               _get(c, "valor", "valor_total"),
+        "valor_pago":          _get(c, "pago", "valor_pago"),
+        "valor_abatido":       _get(c, "abatido", "valor_abatido"),
+        "custas":              _get(c, "custas"),
+        "custas_deduzida":     _get(c, "custas_deduzida", "custas_deduzidas"),
+        "protesto":            _get(c, "protesto"),
+        "protesto_deduzido":   _get(c, "protesto_deduzido"),
+        "honorario":           _get(c, "honorario", "honorarios"),
+        "honorario_repassado": _get(c, "honorario_repassado"),
+        "alvara":              _get(c, "alvara"),
+        "alvara_recebido":     _get(c, "alvara_recebido"),
+        "ganho":               _get(c, "ganho"),
+    }
+
+    return render_template('parcelas.html', contrato=c, parcelas=parcels, resumo=resumo)
+

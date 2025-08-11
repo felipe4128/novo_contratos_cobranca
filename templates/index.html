@@ -8,7 +8,7 @@
 </tr></thead><tbody>{% for c in contratos %}<tr>
 <td>{{ c.cpf }}</td><td>{{ c.cliente }}</td><td>{{ c.numero }}</td><td>{{ c.tipo_contrato }}</td>
 <td>{{ c.valor }}</td><td>{{ c.valor_pago }}</td>
-<td><a href="{{ url_for('parcelas',id=c.id) }}" class="btn btn-primary btn-sm">Parcelas</a></td>
+<td><a href="{{ url_for('ver_parcelas',id=c.id) }}" class="btn btn-primary btn-sm">Parcelas</a></td>
 <td><a href="{{ url_for('editar_info',id=c.id) }}" class="btn btn-secondary btn-sm">Info</a></td>
 <td><form action="{{ url_for('delete', id=c.id) }}" method="post" style="display:inline;"><button type="submit" class="btn btn-danger btn-sm">Excluir</button></form></td>
 </tr>{% endfor %}</tbody></table></div></body></html>
