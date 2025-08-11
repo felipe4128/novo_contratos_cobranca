@@ -3,11 +3,10 @@ import os
 from datetime import date, datetime
 from io import BytesIO
 
-from flask import (
-    Flask, render_template, request, redirect, url_for, send_file, flash
-)
+from flask import Flask, render_template, request, redirect, url_for, send_file, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
+from sqlalchemy import text
 from dateutil.relativedelta import relativedelta
 
 # -----------------------------
@@ -143,6 +142,77 @@ def _parse_money(s):
             return float(str(s).replace(".", "").replace(",", ".").strip())
         except Exception:
             return 0.0
+
+
+# -----------------------------
+# Safe migration (adiciona colunas que faltam)
+# -----------------------------
+def _columns_of(table):
+    eng = db.engine
+    backend = eng.url.get_backend_name()
+    if backend.startswith("sqlite"):
+        rows = db.session.execute(text(f"PRAGMA table_info({table})")).fetchall()
+        return {r[1] for r in rows}  # name at index 1
+    else:
+        rows = db.session.execute(text("""
+            SELECT column_name FROM information_schema.columns
+            WHERE table_schema='public' AND table_name=:t
+        """), {"t": table}).fetchall()
+        return {r[0] for r in rows}
+
+def _add_column_sql(table, name, type_sql):
+    backend = db.engine.url.get_backend_name()
+    if backend.startswith("sqlite"):
+        return f'ALTER TABLE {table} ADD COLUMN {name} {type_sql};'
+    else:
+        return f'ALTER TABLE public.{table} ADD COLUMN IF NOT EXISTS {name} {type_sql};'
+
+def safe_migrate():
+    # Garante tabelas
+    db.create_all()
+
+    # contrato
+    cols = _columns_of("contrato")
+    needed = {
+        "cpf": "TEXT",
+        "cliente": "TEXT",
+        "contrato": "TEXT",
+        "tipo": "TEXT",
+        "valor": "DOUBLE PRECISION",
+        "pago": "DOUBLE PRECISION",
+        "abatido": "DOUBLE PRECISION",
+        "custas": "DOUBLE PRECISION",
+        "custas_deduzida": "DOUBLE PRECISION",
+        "protesto": "DOUBLE PRECISION",
+        "protesto_deduzido": "DOUBLE PRECISION",
+        "honorario": "DOUBLE PRECISION",
+        "honorario_repassado": "DOUBLE PRECISION",
+        "alvara": "DOUBLE PRECISION",
+        "alvara_recebido": "DOUBLE PRECISION",
+        "ganho": "DOUBLE PRECISION",
+        "parcelas": "INTEGER",
+        "vencimento_entrada": "DATE",
+        "created_at": "TIMESTAMP"
+    }
+    for name, t_sql in needed.items():
+        if name not in cols:
+            db.session.execute(text(_add_column_sql("contrato", name, t_sql)))
+
+    # parcela
+    cols = _columns_of("parcela")
+    needed_p = {
+        "contrato_id": "INTEGER",
+        "numero": "INTEGER",
+        "vencimento": "DATE",
+        "valor": "DOUBLE PRECISION",
+        "baixa": "BOOLEAN",
+        "data_baixa": "DATE"
+    }
+    for name, t_sql in needed_p.items():
+        if name not in cols:
+            db.session.execute(text(_add_column_sql("parcela", name, t_sql)))
+
+    db.session.commit()
 
 
 # -----------------------------
@@ -401,7 +471,8 @@ def exportar():
 # Inicialização
 # -----------------------------
 with app.app_context():
-    db.create_all()
+    # cria tabelas e aplica migração segura se necessário
+    safe_migrate()
 
 
 if __name__ == "__main__":
