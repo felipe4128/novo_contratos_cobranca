@@ -43,15 +43,11 @@
       {% set data_baixa = p.baixa or p.baixado_em or p.pago_em %}
       <tr>
         <td>{{ p.numero or loop.index }}</td>
-        <td>{{ p.vencimento|fmtdate if 'fmtdate' in globals() else (p.vencimento.strftime('%d/%m/%Y') if p.vencimento) }}</td>
+        <td>{{ p.vencimento|fmtdate }}</td>
         <td>R$ {{ p.valor|brl }}</td>
         <td>
           {% if data_baixa %}
-            {% if 'fmtdate' in globals() %}
-              Baixada em {{ data_baixa|fmtdate }}
-            {% else %}
-              Baixada
-            {% endif %}
+            Baixada em {{ data_baixa|fmtdate }}
           {% else %}
             <form action="{{ url_for('baixar_parcela', contrato_id=contrato.id, parcela_id=p.id) }}" method="post" style="display:inline">
               <button class="btn btn-primary btn-sm">Dar Baixa</button>
