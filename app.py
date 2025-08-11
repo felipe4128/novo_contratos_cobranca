@@ -450,6 +450,15 @@ def excluir(id):
 # --- fim excluir ---
 
 
+
+
+# --- Alias para compatibilidade: 'ver_parcelas' -> 'parcelas' ---
+@app.route('/contrato/<int:id>/parcelas', endpoint='ver_parcelas')
+def ver_parcelas_alias(id):
+    return redirect(url_for('parcelas', id=id))
+# --- fim alias ---
+
+
 if __name__ == '__main__':
     # create tables on startup
     with app.app_context():
