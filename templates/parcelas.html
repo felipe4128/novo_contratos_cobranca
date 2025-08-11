@@ -40,16 +40,12 @@
   <tbody>
     {% set lista = parcelas if parcelas is defined else parcels %}
     {% for p in lista %}
-      {# valor da parcela com fallbacks #}
-      {% set valor_parc = (p.valor if p.valor is not none else (p.valor_parcela if p.valor_parcela is not none else (p.valor_total if p.valor_total is not none else 0))) %}
-      {# pega data de baixa se existir #}
       {% set data_baixa = p.data_baixa or p.baixa_data or p.baixado_em or p.pago_em %}
-      {# pega flags booleanas de baixa #}
       {% set flag_baixa = p.baixa or p.pago or p.baixada or p.liquidada %}
       <tr>
         <td>{{ p.numero or loop.index }}</td>
         <td>{{ p.vencimento|fmtdate }}</td>
-        <td>R$ {{ (p._valor_render if hasattr(p, '_valor_render') else 0)|brl }}</td>
+        <td>R$ {{ (p._valor_render if p._valor_render is defined else (p.valor or p.valor_parcela or 0)) | brl }}</td>
         <td>
           {% if data_baixa %}
             Baixada em {{ data_baixa|fmtdate }}
