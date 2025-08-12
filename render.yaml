@@ -1,15 +1,11 @@
-
 services:
   - type: web
-    name: novo_contratos_cobranca
+    name: contratos-cobranca
     env: python
-    plan: free
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python app.py"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    autoDeploy: true
     disk:
       name: data
       mountPath: /opt/render/project/src/instance
       sizeGB: 1
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.13.0

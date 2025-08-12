@@ -1,8 +1,7 @@
-
 {% extends "base.html" %}
 {% block content %}
 <h1>Contratos Cobrança</h1>
-<table class="table table-sm table-striped">
+<table class="table table-sm table-striped align-middle">
   <thead>
     <tr>
       <th>CPF</th>
@@ -17,7 +16,7 @@
     </tr>
   </thead>
   <tbody>
-  {% for c in contratos %}
+    {% for c in contratos %}
     <tr>
       <td>{{ c.cpf }}</td>
       <td>{{ c.cliente }}</td>
@@ -33,7 +32,7 @@
         </form>
       </td>
     </tr>
-  {% endfor %}
+    {% endfor %}
   </tbody>
 </table>
 {% endblock %}

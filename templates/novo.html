@@ -1,44 +1,36 @@
-
 {% extends "base.html" %}
 {% block content %}
 <h2>Novo Contrato</h2>
 <form method="post" class="row g-3">
-  <div class="col-md-3">
-    <label class="form-label">CPF</label>
-    <input name="cpf" class="form-control" required>
-  </div>
-  <div class="col-md-5">
-    <label class="form-label">Cliente</label>
-    <input name="cliente" class="form-control" required>
-  </div>
-  <div class="col-md-2">
-    <label class="form-label">Contrato</label>
-    <input name="contrato" class="form-control" required>
-  </div>
-  <div class="col-md-2">
-    <label class="form-label">Tipo</label>
-    <input name="tipo" class="form-control">
-  </div>
+  <div class="col-md-3"><label class="form-label">CPF</label><input name="cpf" class="form-control"></div>
+  <div class="col-md-5"><label class="form-label">Cliente</label><input name="cliente" class="form-control" required></div>
+  <div class="col-md-2"><label class="form-label">Contrato</label><input name="contrato" class="form-control"></div>
+  <div class="col-md-2"><label class="form-label">Tipo</label><input name="tipo" class="form-control"></div>
 
-  <div class="col-md-2">
-    <label class="form-label">Valor Total</label>
-    <input name="valor" class="form-control" placeholder="10000,00">
-  </div>
-  <div class="col-md-2">
-    <label class="form-label">Pago</label>
-    <input name="pago" class="form-control" placeholder="0,00">
-  </div>
-  <div class="col-md-2">
-    <label class="form-label">Parcelas</label>
-    <input name="parcelas" type="number" class="form-control" placeholder="20">
-  </div>
-  <div class="col-md-3">
-    <label class="form-label">Vencimento 1ª parcela</label>
-    <input name="vencimento_entrada" type="date" class="form-control" required>
-  </div>
+  <div class="col-md-2"><label class="form-label">Valor total</label><input name="valor_total" class="form-control" value="0"></div>
+  <div class="col-md-2"><label class="form-label">Valor pago</label><input name="valor_pago" class="form-control" value="0"></div>
+  <div class="col-md-2"><label class="form-label">Valor abatido</label><input name="valor_abatido" class="form-control" value="0"></div>
+
+  <div class="col-md-2"><label class="form-label">Custas</label><input name="custas" class="form-control" value="0"></div>
+  <div class="col-md-2"><label class="form-label">Custas deduzida</label><input name="custas_deduzida" class="form-control" value="0"></div>
+  <div class="col-md-2"><label class="form-label">Protesto</label><input name="protesto" class="form-control" value="0"></div>
+  <div class="col-md-2"><label class="form-label">Protesto deduzido</label><input name="protesto_deduzido" class="form-control" value="0"></div>
+
+  <div class="col-md-2"><label class="form-label">Honorário</label><input name="honorario" class="form-control" value="0"></div>
+  <div class="col-md-2"><label class="form-label">Honorário repassado</label><input name="honorario_repassado" class="form-control" value="0"></div>
+  <div class="col-md-2"><label class="form-label">Alvará</label><input name="alvara" class="form-control" value="0"></div>
+  <div class="col-md-2"><label class="form-label">Alvará recebido</label><input name="alvara_recebido" class="form-control" value="0"></div>
+  <div class="col-md-2"><label class="form-label">Ganho</label><input name="ganho" class="form-control" value="0"></div>
+
+  <div class="col-12"><hr></div>
+
+  <div class="col-md-2"><label class="form-label">Qtd parcelas</label><input name="qtd_parcelas" class="form-control" value="0"></div>
+  <div class="col-md-2"><label class="form-label">Valor parcela</label><input name="valor_parcela" class="form-control" value=""></div>
+  <div class="col-md-3"><label class="form-label">1º vencimento</label><input name="primeiro_vencimento" type="date" class="form-control"></div>
+
   <div class="col-12">
     <button class="btn btn-success">Salvar</button>
-    <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
+    <a class="btn btn-secondary" href="{{ url_for('index') }}">Voltar</a>
   </div>
 </form>
 {% endblock %}

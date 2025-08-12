@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% block content %}
 <h3>Informações do Contrato</h3>
@@ -20,7 +19,7 @@
   <tr><th>Alvará</th><td>R$ {{ (c.alvara or 0)|brl }}</td></tr>
   <tr><th>Alvará recebido</th><td>R$ {{ (c.alvara_recebido or 0)|brl }}</td></tr>
   <tr><th>Ganho</th><td>R$ {{ (c.ganho or 0)|brl }}</td></tr>
-  <tr><th>Criado em</th><td>{{ c.created_at.strftime('%d/%m/%Y %H:%M') if c.created_at }}</td></tr>
+  <tr><th>Criado em</th><td>{{ c.created_at|data }}</td></tr>
 </table>
-<a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm">Voltar</a>
+<a class="btn btn-secondary btn-sm" href="{{ url_for('index') }}">Voltar</a>
 {% endblock %}
