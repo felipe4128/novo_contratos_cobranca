@@ -12,6 +12,7 @@
       <th>Pago</th>
       <th>Parcelas</th>
       <th>Info</th>
+      <th>Editar</th>
       <th>Excluir</th>
     </tr>
   </thead>
@@ -26,6 +27,7 @@
       <td>R$ {{ (c.pago or 0)|brl }}</td>
       <td><a class="btn btn-primary btn-sm" href="{{ url_for('parcelas', id=c.id) }}">Parcelas</a></td>
       <td><a class="btn btn-secondary btn-sm" href="{{ url_for('info', id=c.id) }}">Info</a></td>
+      <td><a class="btn btn-warning btn-sm" href="{{ url_for('editar', id=c.id) }}">Editar</a></td>
       <td>
         <form action="{{ url_for('excluir', id=c.id) }}" method="post" onsubmit="return confirm('Excluir este contrato?');">
           <button class="btn btn-danger btn-sm">Excluir</button>

@@ -16,12 +16,21 @@
     ('Alvará', resumo.alvara),
     ('Alvará recebido', resumo.alvara_recebido),
     ('Ganho', resumo.ganho),
+    ('Qtde parcelas', resumo.qtd_parcelas),
+    ('Pagas', resumo.parcelas_pagas),
+    ('Em aberto', resumo.parcelas_abertas),
   ] %}
   {% for titulo, val in cards %}
   <div class="col-md-3">
     <div class="border rounded p-2">
       <small class="text-muted">{{ titulo }}</small>
-      <div class="fw-bold">R$ {{ (val or 0)|brl }}</div>
+      <div class="fw-bold">
+        {% if 'parcelas' in titulo or titulo in ['Qtde parcelas','Pagas','Em aberto'] %}
+          {{ val }}
+        {% else %}
+          R$ {{ (val or 0)|brl }}
+        {% endif %}
+      </div>
     </div>
   </div>
   {% endfor %}

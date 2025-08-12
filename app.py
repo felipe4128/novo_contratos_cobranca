@@ -3,6 +3,7 @@ import os
 from datetime import date, datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
 # ---------------- App/DB ----------------
 app = Flask(__name__, instance_relative_config=True)
@@ -31,8 +32,8 @@ class Contrato(db.Model):
     contrato = db.Column(db.String(50))
     tipo = db.Column(db.String(50))
 
-    valor = db.Column(db.Float, default=0.0)
-    pago = db.Column(db.Float, default=0.0)
+    valor = db.Column(db.Float, default=0.0)       # Valor total do contrato
+    pago = db.Column(db.Float, default=0.0)        # Valor pago acumulado
     abatido = db.Column(db.Float, default=0.0)
 
     custas = db.Column(db.Float, default=0.0)
@@ -149,11 +150,42 @@ def novo():
 
     return render_template("novo.html")
 
+@app.route("/editar/<int:id>", methods=["GET", "POST"])
+def editar(id):
+    c = Contrato.query.get_or_404(id)
+    if request.method == "POST":
+        # Atualiza campos principais e financeiros
+        c.cpf = (request.form.get("cpf") or "").strip()
+        c.cliente = (request.form.get("cliente") or "").strip()
+        c.contrato = (request.form.get("contrato") or "").strip()
+        c.tipo = (request.form.get("tipo") or "").strip()
+        for fld in ["valor_total","valor_pago","valor_abatido","custas","custas_deduzida",
+                    "protesto","protesto_deduzido","honorario","honorario_repassado",
+                    "alvara","alvara_recebido","ganho"]:
+            val = request.form.get(fld)
+            try:
+                setattr(c, 
+                        {"valor_total":"valor","valor_pago":"pago","valor_abatido":"abatido"}.get(fld, fld), 
+                        float(val or 0))
+            except Exception:
+                setattr(c, 
+                        {"valor_total":"valor","valor_pago":"pago","valor_abatido":"abatido"}.get(fld, fld), 
+                        0.0)
+        db.session.commit()
+        flash("Contrato atualizado.", "success")
+        return redirect(url_for("index"))
+    return render_template("editar.html", c=c)
+
 @app.route("/parcelas/<int:id>")
 @app.route("/contrato/<int:id>/parcelas")
 def parcelas(id):
     c = Contrato.query.get_or_404(id)
     parcels = Parcela.query.filter_by(contrato_id=id).order_by(Parcela.numero.asc()).all()
+
+    total_parcelas = len(parcels)
+    pagas = len([p for p in parcels if p.baixado_em])
+    abertas = total_parcelas - pagas
+
     resumo = {
         "valor": c.valor or 0,
         "valor_pago": c.pago or 0,
@@ -167,6 +199,9 @@ def parcelas(id):
         "alvara": c.alvara or 0,
         "alvara_recebido": c.alvara_recebido or 0,
         "ganho": c.ganho or 0,
+        "qtd_parcelas": total_parcelas,
+        "parcelas_pagas": pagas,
+        "parcelas_abertas": abertas,
     }
     return render_template("parcelas.html", contrato=c, parcels=parcels, resumo=resumo)
 
@@ -175,6 +210,9 @@ def baixar_parcela(contrato_id, parcela_id):
     p = Parcela.query.filter_by(id=parcela_id, contrato_id=contrato_id).first_or_404()
     if not p.baixado_em:
         p.baixado_em = date.today()
+        # Atualiza total pago no contrato somando o valor desta parcela
+        if p.valor:
+            p.contrato.pago = (p.contrato.pago or 0) + p.valor
         db.session.commit()
         flash("Parcela baixada com sucesso!", "success")
     return redirect(url_for("parcelas", id=contrato_id))
@@ -194,7 +232,6 @@ def excluir(id):
 
 @app.route("/exportar")
 def exportar():
-    # Exporta CSV simples
     from io import StringIO, BytesIO
     import csv
     mem = StringIO()

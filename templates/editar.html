@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Editar Contrato #{{ c.id }}</h2>
+<form method="post" class="row g-3">
+  <div class="col-md-3"><label class="form-label">CPF</label><input name="cpf" class="form-control" value="{{ c.cpf }}"></div>
+  <div class="col-md-5"><label class="form-label">Cliente</label><input name="cliente" class="form-control" value="{{ c.cliente }}" required></div>
+  <div class="col-md-2"><label class="form-label">Contrato</label><input name="contrato" class="form-control" value="{{ c.contrato }}"></div>
+  <div class="col-md-2"><label class="form-label">Tipo</label><input name="tipo" class="form-control" value="{{ c.tipo }}"></div>
+
+  <div class="col-md-2"><label class="form-label">Valor total</label><input name="valor_total" class="form-control" value="{{ c.valor }}"></div>
+  <div class="col-md-2"><label class="form-label">Valor pago</label><input name="valor_pago" class="form-control" value="{{ c.pago }}"></div>
+  <div class="col-md-2"><label class="form-label">Valor abatido</label><input name="valor_abatido" class="form-control" value="{{ c.abatido }}"></div>
+
+  <div class="col-md-2"><label class="form-label">Custas</label><input name="custas" class="form-control" value="{{ c.custas }}"></div>
+  <div class="col-md-2"><label class="form-label">Custas deduzida</label><input name="custas_deduzida" class="form-control" value="{{ c.custas_deduzida }}"></div>
+  <div class="col-md-2"><label class="form-label">Protesto</label><input name="protesto" class="form-control" value="{{ c.protesto }}"></div>
+  <div class="col-md-2"><label class="form-label">Protesto deduzido</label><input name="protesto_deduzido" class="form-control" value="{{ c.protesto_deduzido }}"></div>
+
+  <div class="col-md-2"><label class="form-label">Honorário</label><input name="honorario" class="form-control" value="{{ c.honorario }}"></div>
+  <div class="col-md-2"><label class="form-label">Honorário repassado</label><input name="honorario_repassado" class="form-control" value="{{ c.honorario_repassado }}"></div>
+  <div class="col-md-2"><label class="form-label">Alvará</label><input name="alvara" class="form-control" value="{{ c.alvara }}"></div>
+  <div class="col-md-2"><label class="form-label">Alvará recebido</label><input name="alvara_recebido" class="form-control" value="{{ c.alvara_recebido }}"></div>
+  <div class="col-md-2"><label class="form-label">Ganho</label><input name="ganho" class="form-control" value="{{ c.ganho }}"></div>
+
+  <div class="col-12">
+    <button class="btn btn-primary">Salvar</button>
+    <a class="btn btn-secondary" href="{{ url_for('index') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

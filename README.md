@@ -1,12 +1,5 @@
-# Contratos Cobrança (Flask 3.x)
+# Contratos Cobrança (Full Info)
 
-- Banco: **SQLite** por padrão em `instance/credito.db` (persistente no Render via disk).
-- Se houver `DATABASE_URL`, usa Postgres (corrige `postgres://`).
-- Páginas: index, novo, parcelas, baixar parcela (POST), info, excluir (POST), exportar (CSV).
-
-## Rodar local
-```bash
-pip install -r requirements.txt
-python app.py
-# abra http://localhost:5000
-```
+- Mantém todas as informações solicitadas: cards no topo de Parcelas (Valor, Pago, Abatido, Custas, Custas deduzida, Protesto, Protesto deduzido, Honorário, Honorário repassado, Alvará, Alvará recebido, Ganho) + contadores (Qtde, Pagas, Em aberto).
+- Index: CPF, Cliente, Contrato, Tipo, Valor, Pago + botões Parcelas, Info, Editar, Excluir.
+- Novo/Editar: formulário com todos os campos + geração de parcelas por quantidade/valor e primeiro vencimento.
