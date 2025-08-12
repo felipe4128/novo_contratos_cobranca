@@ -1,15 +1,26 @@
+
 {% extends "base.html" %}
 {% block content %}
-<div class="bg-white p-3 rounded shadow-sm">
-  <h5>Informações do Contrato</h5>
-  <div class="row g-2">
-    <div class="col-md-3"><strong>CPF:</strong> {{ c.cpf }}</div>
-    <div class="col-md-3"><strong>Cliente:</strong> {{ c.cliente }}</div>
-    <div class="col-md-2"><strong>Contrato:</strong> {{ c.contrato }}</div>
-    <div class="col-md-2"><strong>Tipo:</strong> {{ c.tipo }}</div>
-    <div class="col-md-2"><strong>Criado em:</strong> {{ c.created_at|data }}</div>
-  </div>
-  <hr>
-  <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">Voltar</a>
-</div>
+<h3>Informações do Contrato</h3>
+<table class="table table-sm">
+  <tr><th>ID</th><td>{{ c.id }}</td></tr>
+  <tr><th>CPF</th><td>{{ c.cpf }}</td></tr>
+  <tr><th>Cliente</th><td>{{ c.cliente }}</td></tr>
+  <tr><th>Contrato</th><td>{{ c.contrato }}</td></tr>
+  <tr><th>Tipo</th><td>{{ c.tipo }}</td></tr>
+  <tr><th>Valor</th><td>R$ {{ (c.valor or 0)|brl }}</td></tr>
+  <tr><th>Pago</th><td>R$ {{ (c.pago or 0)|brl }}</td></tr>
+  <tr><th>Abatido</th><td>R$ {{ (c.abatido or 0)|brl }}</td></tr>
+  <tr><th>Custas</th><td>R$ {{ (c.custas or 0)|brl }}</td></tr>
+  <tr><th>Custas deduzida</th><td>R$ {{ (c.custas_deduzida or 0)|brl }}</td></tr>
+  <tr><th>Protesto</th><td>R$ {{ (c.protesto or 0)|brl }}</td></tr>
+  <tr><th>Protesto deduzido</th><td>R$ {{ (c.protesto_deduzido or 0)|brl }}</td></tr>
+  <tr><th>Honorário</th><td>R$ {{ (c.honorario or 0)|brl }}</td></tr>
+  <tr><th>Honorário repassado</th><td>R$ {{ (c.honorario_repassado or 0)|brl }}</td></tr>
+  <tr><th>Alvará</th><td>R$ {{ (c.alvara or 0)|brl }}</td></tr>
+  <tr><th>Alvará recebido</th><td>R$ {{ (c.alvara_recebido or 0)|brl }}</td></tr>
+  <tr><th>Ganho</th><td>R$ {{ (c.ganho or 0)|brl }}</td></tr>
+  <tr><th>Criado em</th><td>{{ c.created_at.strftime('%d/%m/%Y %H:%M') if c.created_at }}</td></tr>
+</table>
+<a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm">Voltar</a>
 {% endblock %}

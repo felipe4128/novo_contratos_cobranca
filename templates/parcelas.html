@@ -1,12 +1,13 @@
+
 {% extends "base.html" %}
 {% block content %}
-<h5 class="mb-3">Parcelas - Contrato {{ contrato.contrato or contrato.id }}</h5>
+<h3>Parcelas - Contrato {{ contrato.contrato or contrato.id }}</h3>
 
 <div class="row g-2 mb-3">
   {% set cards = [
     ('Valor', resumo.valor),
-    ('Valor pago', resumo.valor_pago),
-    ('Valor abatido', resumo.valor_abatido),
+    ('Valor pago', resumo.pago),
+    ('Valor abatido', resumo.abatido),
     ('Custas', resumo.custas),
     ('Custas deduzida', resumo.custas_deduzida),
     ('Protesto', resumo.protesto),
@@ -15,48 +16,46 @@
     ('Honorário repassado', resumo.honorario_repassado),
     ('Alvará', resumo.alvara),
     ('Alvará recebido', resumo.alvara_recebido),
-    ('Ganho', resumo.ganho),
+    ('Ganho', resumo.ganho)
   ] %}
-  {% for titulo, val in cards %}
+  {% for label, val in cards %}
   <div class="col-md-3">
-    <div class="card card-resumo">
-      <div class="card-body py-2">
-        <div class="card-title">{{ titulo }}</div>
-        <div class="valor">R$ {{ val|brl }}</div>
-      </div>
+    <div class="border rounded p-2">
+      <small class="text-muted">{{ label }}</small>
+      <div><strong>R$ {{ (val or 0)|brl }}</strong></div>
     </div>
   </div>
   {% endfor %}
 </div>
 
-<table class="table table-sm bg-white">
-  <thead class="table-light">
+<table class="table table-sm table-striped">
+  <thead>
     <tr>
-      <th style="width: 50px;">#</th>
+      <th>#</th>
       <th>Vencimento</th>
       <th>Valor</th>
       <th>Baixa</th>
     </tr>
   </thead>
   <tbody>
-    {% for p in parcels %}
+  {% for p in parcels %}
     <tr>
       <td>{{ p.numero }}</td>
-      <td>{{ p.vencimento|data }}</td>
-      <td>R$ {{ p.valor|brl }}</td>
+      <td>{{ p.vencimento.strftime('%d/%m/%Y') }}</td>
+      <td>R$ {{ (p.valor or 0)|brl }}</td>
       <td>
         {% if p.baixado_em %}
-          <span class="text-success">Baixada em {{ p.baixado_em|data }}</span>
+          <span class="text-success">Baixada em {{ p.baixado_em.strftime('%d/%m/%Y') }}</span>
         {% else %}
-          <form action="{{ url_for('baixar_parcela', cid=contrato.id, pid=p.id) }}" method="post">
-            <button class="btn btn-primary btn-sm">Dar Baixa</button>
-          </form>
+        <form method="post" action="{{ url_for('baixar_parcela', contrato_id=contrato.id, parcela_id=p.id) }}">
+          <button class="btn btn-primary btn-sm">Dar Baixa</button>
+        </form>
         {% endif %}
       </td>
     </tr>
-    {% endfor %}
+  {% endfor %}
   </tbody>
 </table>
 
-<a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">Voltar</a>
+<a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm">Voltar</a>
 {% endblock %}
