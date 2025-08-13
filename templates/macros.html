@@ -1,0 +1,32 @@
+{% macro input(name, label, value='', type='text', cls='') -%}
+  <div class="mb-3">
+    <label class="form-label" for="{{name}}">{{label}}</label>
+    <input class="form-control {{cls}}" id="{{name}}" name="{{name}}" type="{{type}}" value="{{value|default('') }}">
+  </div>
+{%- endmacro %}
+
+{% macro money(name, label, value='') -%}
+  {{ input(name, label, value=value, type='text', cls='money') }}
+{%- endmacro %}
+
+{% macro date(name, label, value='') -%}
+  {{ input(name, label, value=value, type='date') }}
+{%- endmacro %}
+
+{% macro select(name, label, options=[], selected='') -%}
+  <div class="mb-3">
+    <label class="form-label" for="{{name}}">{{label}}</label>
+    <select class="form-select" id="{{name}}" name="{{name}}">
+      {% for opt in options %}
+      <option value="{{opt}}" {{ 'selected' if opt==selected else '' }}>{{opt}}</option>
+      {% endfor %}
+    </select>
+  </div>
+{%- endmacro %}
+
+{% macro textarea(name, label, value='') -%}
+  <div class="mb-3">
+    <label class="form-label" for="{{name}}">{{label}}</label>
+    <textarea class="form-control" id="{{name}}" name="{{name}}" rows="2">{{ value|default('') }}</textarea>
+  </div>
+{%- endmacro %}

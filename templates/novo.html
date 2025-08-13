@@ -1,76 +1,61 @@
 {% extends "base.html" %}
-{% from _self import number, text, date %}
-{% macro number(name, label) -%}
-<div class="col-md-3">
-  <label class="form-label">{{ label }}</label>
-  <input name="{{ name }}" type="text" class="form-control" value="{{ request.form.get(name, '') }}">
-</div>
-{%- endmacro %}
-
-{% macro text(name, label, cols=3) -%}
-<div class="col-md-{{ cols }}">
-  <label class="form-label">{{ label }}</label>
-  <input name="{{ name }}" type="text" class="form-control" value="{{ request.form.get(name, '') }}">
-</div>
-{%- endmacro %}
-
-{% macro date(name, label) -%}
-<div class="col-md-3">
-  <label class="form-label">{{ label }}</label>
-  <input name="{{ name }}" type="date" class="form-control" value="{{ request.form.get(name, '') }}">
-</div>
-{%- endmacro %}
-
+{% from 'macros.html' import input, money, date, select, textarea %}
 {% block content %}
-<h1 class="h4 mb-3">Novo contrato</h1>
-<form method="post" class="row g-3">
-  {{ text('contrato','Contrato',3) }}
-  {{ text('cooperado','Cooperado',3) }}
-  {{ text('cpf','CPF',3) }}
-  {{ text('advogado','Advogado',3) }}
-  {{ text('tipo','Tipo',3) }}
-  {{ text('garantia','Garantia',3) }}
-
-  {{ number('valor','Valor do contrato no sistema') }}
-  {{ text('baixa_48m','Baixa acima de 48 meses') }}
-  {{ number('valor_abatido','Valor abatido no contrato') }}
-  {{ number('ganho','Ganho') }}
-
-  {{ number('custas','Custas') }}
-  {{ number('custas_deduzidas','Custas deduzidas') }}
-  {{ number('protesto','Protesto') }}
-  {{ number('protesto_deduzido','Protesto deduzido') }}
-  {{ number('honorario','Honorário') }}
-  {{ number('honorario_repassado','Honorário repassado') }}
-  {{ number('alvara','Alvará') }}
-  {{ number('alvara_recebido','Alvará recebido') }}
-
-  {{ number('valor_entrada','Valor de entrada') }}
-  {{ date('vencimento_entrada','Vencimento entrada') }}
-  {{ number('valor_parcelas','Valor das parcelas') }}
-  {{ text('parcelas','Parcelas') }}
-  {{ text('parcelas_restantes','Parcelas restantes') }}
-  {{ text('vencimento_parcelas_dia','Vencimento das parcelas (dia)') }}
-
-  {{ text('qtd_boletos_emitidos','Quantidade boletos emitidos') }}
-  {{ number('valor_pg_boleto','Valor pg com boleto') }}
-  {{ date('data_pg_boleto','Data pg boleto') }}
-  {{ date('data_baixa','Data da baixa') }}
-
-  <div class="col-12">
-    <label class="form-label">Obs contabilidade</label>
-    <textarea name="obs_contabilidade" class="form-control" rows="2">{{ request.form.get('obs_contabilidade', '') }}</textarea>
-  </div>
-  <div class="col-12">
-    <label class="form-label">Obs contas a receber</label>
-    <textarea name="obs_contas_receber" class="form-control" rows="2">{{ request.form.get('obs_contas_receber', '') }}</textarea>
+<h2>Novo Contrato</h2>
+<form method="post">
+  <div class="row">
+    <div class="col-md-2">{{ input('contrato','Contrato') }}</div>
+    <div class="col-md-2">{{ input('tipo','Tipo') }}</div>
+    <div class="col-md-2">{{ input('garantia','Garantia') }}</div>
+    <div class="col-md-3">{{ money('valor','Valor do contrato') }}</div>
+    <div class="col-md-3">{{ input('baixa_acima_48_meses','Baixa acima de 48 meses') }}</div>
   </div>
 
-  {{ number('valor_repassar_escritorio','Valor a repassar p/ escritório (honorários)') }}
+  <div class="row">
+    <div class="col-md-3">{{ money('valor_abatido','Valor abatido no contrato') }}</div>
+    <div class="col-md-3">{{ money('ganho','Ganho') }}</div>
+    <div class="col-md-3">{{ money('custas','Custas') }}</div>
+    <div class="col-md-3">{{ money('custas_deduzidas','Custas deduzidas') }}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">{{ money('protesto','Protesto') }}</div>
+    <div class="col-md-3">{{ money('protesto_deduzido','Protesto deduzido') }}</div>
+    <div class="col-md-3">{{ money('honorario','Honorário') }}</div>
+    <div class="col-md-3">{{ money('honorario_repassado','Honorário repassado') }}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">{{ money('alvara','Alvará') }}</div>
+    <div class="col-md-3">{{ money('alvara_recebido','Alvará recebido') }}</div>
+    <div class="col-md-3">{{ input('cooperado','Cooperado') }}</div>
+    <div class="col-md-3">{{ input('cpf','CPF') }}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">{{ input('advogado','Advogado') }}</div>
+    <div class="col-md-4">{{ money('valor_entrada','Valor de entrada') }}</div>
+    <div class="col-md-4">{{ date('vencimento_entrada','Vencimento entrada') }}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">{{ money('valor_parcelas','Valor das parcelas') }}</div>
+    <div class="col-md-4">{{ input('parcelas','Parcelas') }}</div>
+    <div class="col-md-4">{{ input('parcelas_restantes','Parcelas restantes') }}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">{{ date('vencimento_parcelas','Vencimento das parcelas') }}</div>
+    <div class="col-md-4">{{ input('qtd_boletos_emitidos','Quantidade boletos emitidos') }}</div>
+    <div class="col-md-4">{{ money('valor_pg_boleto','Valor pg com boleto') }}</div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">{{ date('data_pg_boleto','Data pg boleto') }}</div>
+    <div class="col-md-4">{{ date('data_baixa','Data da baixa') }}</div>
+    <div class="col-md-4">{{ money('valor_repassar_escritorio','Valor a repassar p/ escritório (honorários)') }}</div>
+  </div>
 
-  <div class="col-12">
-    <button class="btn btn-success">Salvar</button>
-    <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar</a>
+  {{ textarea('obs_contabilidade','Obs para contabilidade:') }}
+  {{ textarea('obs_contas_receber','Obs do contas a receber:') }}
+
+  <div class="mt-2">
+    <button class="btn btn-primary">Salvar</button>
+    <a class="btn btn-secondary" href="{{ url_for('index') }}">Voltar</a>
   </div>
 </form>
 {% endblock %}

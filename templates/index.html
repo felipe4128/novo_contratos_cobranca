@@ -1,32 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="h4">Contratos</h1>
-<table class="table table-sm table-striped align-middle">
+<h1 class="mb-4">Contratos Cobrança</h1>
+<div class="mb-3">
+  <a class="btn btn-success" href="{{ url_for('novo') }}">Novo Contrato</a>
+</div>
+<div class="table-responsive">
+<table class="table table-sm align-middle table-striped">
   <thead>
     <tr>
-      <th>#</th><th>Contrato</th><th>Tipo</th><th>Garantia</th><th>Valor</th><th>Parcelas</th><th>Ações</th>
+      <th>CPF</th>
+      <th>Cooperado</th>
+      <th>Advogado</th>
+      <th>Contrato</th>
+      <th>Tipo</th>
+      <th>Garantia</th>
+      <th>Valor</th>
+      <th>Parcelas</th>
+      <th>Restantes</th>
+      <th>Ações</th>
     </tr>
   </thead>
   <tbody>
     {% for c in contratos %}
     <tr>
-      <td>{{ c.id }}</td>
-      <td>{{ c.contrato }}</td>
+      <td>{{ c.cpf }}</td>
+      <td>{{ c.cooperado }}</td>
+      <td>{{ c.advogado }}</td>
+      <td>{{ c.contrato or c.id }}</td>
       <td>{{ c.tipo }}</td>
       <td>{{ c.garantia }}</td>
-      <td>R$ {{ (c.valor or 0) | string }}</td>
-      <td>{{ c.parcelas or '-' }}</td>
-      <td>
-        <a class="btn btn-primary btn-sm" href="{{ url_for('parcelas', id=c.id) }}">Parcelas</a>
-        <a class="btn btn-secondary btn-sm" href="{{ url_for('editar_info', id=c.id) }}">Info</a>
-        <form action="{{ url_for('excluir', id=c.id) }}" method="post" class="d-inline" onsubmit="return confirm('Excluir este contrato?');">
+      <td>R$ {{ c.valor|brl }}</td>
+      <td>{{ c.parcelas or 0 }}</td>
+      <td>{{ c.parcelas_restantes or 0 }}</td>
+      <td class="text-nowrap">
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('info', id=c.id) }}">Info</a>
+        <form action="{{ url_for('excluir', id=c.id) }}" method="post" style="display:inline" onsubmit="return confirm('Excluir este contrato?');">
           <button class="btn btn-danger btn-sm">Excluir</button>
         </form>
       </td>
     </tr>
-    {% else %}
-    <tr><td colspan="7" class="text-center text-muted">Nenhum contrato cadastrado.</td></tr>
     {% endfor %}
   </tbody>
 </table>
+</div>
 {% endblock %}
