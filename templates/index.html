@@ -1,40 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="mb-4">Contratos Cobrança</h1>
-<div class="mb-3">
-  <a class="btn btn-success" href="{{ url_for('novo') }}">Novo Contrato</a>
-</div>
-<div class="table-responsive">
-<table class="table table-sm align-middle table-striped">
+<h1>Contratos</h1>
+
+<table class="table table-sm">
   <thead>
     <tr>
-      <th>CPF</th>
-      <th>Cooperado</th>
       <th>Advogado</th>
       <th>Contrato</th>
+      <th>CPF</th>
+      <th>Cooperado</th>
       <th>Tipo</th>
-      <th>Garantia</th>
-      <th>Valor</th>
-      <th>Parcelas</th>
-      <th>Restantes</th>
+      <th class="text-end">Valor</th>
+      <th class="text-end">Valor pago</th>
       <th>Ações</th>
     </tr>
   </thead>
   <tbody>
     {% for c in contratos %}
     <tr>
+      <td>{{ c.advogado }}</td>
+      <td>{{ c.contrato or c.numero or c.id }}</td>
       <td>{{ c.cpf }}</td>
       <td>{{ c.cooperado }}</td>
-      <td>{{ c.advogado }}</td>
-      <td>{{ c.contrato or c.id }}</td>
-      <td>{{ c.tipo }}</td>
-      <td>{{ c.garantia }}</td>
-      <td>R$ {{ c.valor|brl }}</td>
-      <td>{{ c.parcelas or 0 }}</td>
-      <td>{{ c.parcelas_restantes or 0 }}</td>
-      <td class="text-nowrap">
-        <a class="btn btn-secondary btn-sm" href="{{ url_for('info', id=c.id) }}">Info</a>
-        <form action="{{ url_for('excluir', id=c.id) }}" method="post" style="display:inline" onsubmit="return confirm('Excluir este contrato?');">
+      <td>{{ c.tipo or c.tipo_contrato }}</td>
+      <td class="text-end">R$ {{ (c.valor or c.valor_total or 0) | brl }}</td>
+      <td class="text-end">R$ {{ (c.pago or c.valor_pago or 0) | brl }}</td>
+      <td>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('parcelas', id=c.id) }}">Parcelas</a>
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('editar_info', id=c.id) }}">Info</a>
+        <form action="{{ url_for('excluir', id=c.id) }}" method="post"
+              style="display:inline" onsubmit="return confirm('Excluir este contrato?');">
           <button class="btn btn-danger btn-sm">Excluir</button>
         </form>
       </td>
@@ -42,5 +37,9 @@
     {% endfor %}
   </tbody>
 </table>
+
+<div class="mt-3">
+  <a class="btn btn-success" href="{{ url_for('novo') }}">Novo Contrato</a>
+  <a class="btn btn-outline-primary" href="{{ url_for('exportar') }}">Exportar</a>
 </div>
 {% endblock %}
