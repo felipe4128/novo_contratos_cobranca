@@ -1,52 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
-<h4>Novo contrato</h4>
-<form method="post" class="row g-2">
-  <div class="col-md-3"><label class="form-label">Contrato</label><input name="contrato" class="form-control"></div>
-  <div class="col-md-3"><label class="form-label">Tipo</label><input name="tipo" class="form-control"></div>
-  <div class="col-md-3"><label class="form-label">Garantia</label><input name="garantia" class="form-control"></div>
-  <div class="col-md-3"><label class="form-label">Cliente</label><input name="cliente" class="form-control"></div>
-  <div class="col-md-3"><label class="form-label">CPF</label><input name="cpf" class="form-control"></div>
-
-  <div class="col-md-3"><label class="form-label">Valor no sistema</label><input name="valor_contrato_sistema" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Valor abatido</label><input name="valor_abatido" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Ganho</label><input name="ganho" class="form-control" value="0"></div>
-
-  <div class="col-md-3"><label class="form-label">Custas</label><input name="custas" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Custas deduzidas</label><input name="custas_deduzidas" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Protesto</label><input name="protesto" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Protesto deduzido</label><input name="protesto_deduzido" class="form-control" value="0"></div>
-
-  <div class="col-md-3"><label class="form-label">Honorário</label><input name="honorario" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Honorário repassado</label><input name="honorario_repassado" class="form-control" value="0"></div>
-
-  <div class="col-md-3"><label class="form-label">Alvará</label><input name="alvara" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Alvará recebido</label><input name="alvara_recebido" class="form-control" value="0"></div>
-
-  <div class="col-md-3"><label class="form-label">Valor de entrada</label><input name="valor_entrada" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Venc. entrada</label><input name="vencimento_entrada" class="form-control" placeholder="YYYY-MM-DD"></div>
-
-  <div class="col-md-3"><label class="form-label">Valor parcela</label><input name="valor_parcela" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Qtd parcelas</label><input name="parcelas_qtd" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">1º vencimento</label><input name="primeiro_vencimento" class="form-control" placeholder="YYYY-MM-DD"></div>
-
-  <div class="col-md-3"><label class="form-label">Qtd boletos emitidos</label><input name="qtd_boletos" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Valor pg c/ boleto</label><input name="valor_pg_boleto" class="form-control" value="0"></div>
-  <div class="col-md-3"><label class="form-label">Data pg boleto</label><input name="data_pg_boleto" class="form-control" placeholder="YYYY-MM-DD"></div>
-
-  <div class="col-md-3"><label class="form-label">Data da baixa</label><input name="data_baixa" class="form-control" placeholder="YYYY-MM-DD"></div>
-  <div class="col-12">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" name="baixa_acima_48m" id="bx48">
-      <label class="form-check-label" for="bx48">Baixa acima de 48 meses</label>
-    </div>
+<h1 class="h5 mb-3">Novo contrato</h1>
+<form method="post" class="row g-3">
+  <div class="col-md-3">
+    <label class="form-label">Contrato</label>
+    <input name="contrato" class="form-control">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Cliente</label>
+    <input name="cliente" class="form-control">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">CPF</label>
+    <input name="cpf" class="form-control">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Tipo</label>
+    <input name="tipo" class="form-control">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Garantia</label>
+    <input name="garantia" class="form-control">
   </div>
 
-  <div class="col-md-6"><label class="form-label">Obs contabilidade</label><textarea name="obs_contabilidade" class="form-control"></textarea></div>
-  <div class="col-md-6"><label class="form-label">Obs contas a receber</label><textarea name="obs_receber" class="form-control"></textarea></div>
+  <div class="col-md-3">
+    <label class="form-label">Valor do contrato</label>
+    <input name="valor_total" class="form-control" placeholder="0,00">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Valor da parcela</label>
+    <input name="valor_parcela" class="form-control" placeholder="0,00">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">Parcelas</label>
+    <input name="parcelas" type="number" class="form-control" min="0">
+  </div>
+  <div class="col-md-2">
+    <label class="form-label">1º vencimento</label>
+    <input name="vencimento_parcelas" type="date" class="form-control">
+  </div>
 
-  <div class="col-md-4"><label class="form-label">Valor a repassar p/ escritório (honorários)</label><input name="valor_repassar_escritorio" class="form-control" value="0"></div>
-
-  <div class="col-12 mt-3"><button class="btn btn-primary">Salvar</button></div>
+  <div class="col-12">
+    <button class="btn btn-success">Salvar</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('index') }}">Cancelar</a>
+  </div>
 </form>
 {% endblock %}

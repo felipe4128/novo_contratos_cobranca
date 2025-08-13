@@ -1,5 +1,13 @@
-# Contratos Cobrança (Full Info)
+# Contratos Cobrança (Flask)
 
-- Mantém todas as informações solicitadas: cards no topo de Parcelas (Valor, Pago, Abatido, Custas, Custas deduzida, Protesto, Protesto deduzido, Honorário, Honorário repassado, Alvará, Alvará recebido, Ganho) + contadores (Qtde, Pagas, Em aberto).
-- Index: CPF, Cliente, Contrato, Tipo, Valor, Pago + botões Parcelas, Info, Editar, Excluir.
-- Novo/Editar: formulário com todos os campos + geração de parcelas por quantidade/valor e primeiro vencimento.
+## Rodando local
+```bash
+python -m venv .venv
+source .venv/bin/activate  # no Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+```
+Acesse: http://localhost:10000
+
+## Render
+Defina `DATABASE_URL` (Postgres) ou deixe vazio para usar SQLite (instance/credito.db).
