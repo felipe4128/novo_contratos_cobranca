@@ -1,37 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="h4 mb-3">Contratos</h1>
-<table class="table table-sm table-hover align-middle">
-  <thead class="table-light">
+<h1 class="h4">Contratos</h1>
+<table class="table table-sm table-striped align-middle">
+  <thead>
     <tr>
-      <th>CPF</th>
-      <th>Cliente</th>
-      <th>Contrato</th>
-      <th>Tipo</th>
-      <th>Valor</th>
-      <th>Pago</th>
-      <th>Parcelas</th>
-      <th>Info</th>
-      <th>Excluir</th>
+      <th>#</th><th>Contrato</th><th>Tipo</th><th>Garantia</th><th>Valor</th><th>Parcelas</th><th>Ações</th>
     </tr>
   </thead>
   <tbody>
     {% for c in contratos %}
     <tr>
-      <td>{{ c.cpf or '' }}</td>
-      <td>{{ c.cliente or '' }}</td>
-      <td>{{ c.contrato or c.id }}</td>
-      <td>{{ c.tipo or '' }}</td>
-      <td>R$ {{ c.valor_total|brl }}</td>
-      <td>R$ {{ c.pago|brl }}</td>
-      <td><a class="btn btn-primary btn-sm" href="{{ url_for('parcelas', id=c.id) }}">Parcelas</a></td>
-      <td><a class="btn btn-secondary btn-sm" href="{{ url_for('editar_info', id=c.id) }}">Info</a></td>
+      <td>{{ c.id }}</td>
+      <td>{{ c.contrato }}</td>
+      <td>{{ c.tipo }}</td>
+      <td>{{ c.garantia }}</td>
+      <td>R$ {{ (c.valor or 0) | string }}</td>
+      <td>{{ c.parcelas or '-' }}</td>
       <td>
-        <form action="{{ url_for('excluir', id=c.id) }}" method="post" onsubmit="return confirm('Excluir este contrato?');">
+        <a class="btn btn-primary btn-sm" href="{{ url_for('parcelas', id=c.id) }}">Parcelas</a>
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('editar_info', id=c.id) }}">Info</a>
+        <form action="{{ url_for('excluir', id=c.id) }}" method="post" class="d-inline" onsubmit="return confirm('Excluir este contrato?');">
           <button class="btn btn-danger btn-sm">Excluir</button>
         </form>
       </td>
     </tr>
+    {% else %}
+    <tr><td colspan="7" class="text-center text-muted">Nenhum contrato cadastrado.</td></tr>
     {% endfor %}
   </tbody>
 </table>
