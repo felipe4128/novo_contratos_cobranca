@@ -1,60 +1,51 @@
 {% extends "base.html" %}
-{% from 'macros.html' import input, money, date, select, textarea %}
 {% block content %}
-<h2>Informações do contrato #{{ c.contrato or c.id }}</h2>
-<form method="post">
-  <div class="row">
-    <div class="col-md-2">{{ input('contrato','Contrato', c.contrato) }}</div>
-    <div class="col-md-2">{{ input('tipo','Tipo', c.tipo) }}</div>
-    <div class="col-md-2">{{ input('garantia','Garantia', c.garantia) }}</div>
-    <div class="col-md-3">{{ money('valor','Valor do contrato', c.valor) }}</div>
-    <div class="col-md-3">{{ input('baixa_acima_48_meses','Baixa acima de 48 meses', c.baixa_acima_48_meses) }}</div>
-  </div>
+<h4>Informações do contrato #{{ c.contrato or c.id }}</h4>
+<form method="post" class="row g-3">
+  <div class="col-md-2"><label class="form-label">Contrato</label><input name="contrato" class="form-control" value="{{ c.contrato }}"></div>
+  <div class="col-md-3"><label class="form-label">Cooperado</label><input name="cooperado" class="form-control" value="{{ c.cooperado }}"></div>
+  <div class="col-md-2"><label class="form-label">CPF</label><input name="cpf" class="form-control" value="{{ c.cpf }}"></div>
+  <div class="col-md-3"><label class="form-label">Advogado</label><input name="advogado" class="form-control" value="{{ c.advogado }}"></div>
 
-  <div class="row">
-    <div class="col-md-3">{{ money('valor_abatido','Valor abatido no contrato', c.valor_abatido) }}</div>
-    <div class="col-md-3">{{ money('ganho','Ganho', c.ganho) }}</div>
-    <div class="col-md-3">{{ money('custas','Custas', c.custas) }}</div>
-    <div class="col-md-3">{{ money('custas_deduzidas','Custas deduzidas', c.custas_deduzidas) }}</div>
-  </div>
-  <div class="row">
-    <div class="col-md-3">{{ money('protesto','Protesto', c.protesto) }}</div>
-    <div class="col-md-3">{{ money('protesto_deduzido','Protesto deduzido', c.protesto_deduzido) }}</div>
-    <div class="col-md-3">{{ money('honorario','Honorário', c.honorario) }}</div>
-    <div class="col-md-3">{{ money('honorario_repassado','Honorário repassado', c.honorario_repassado) }}</div>
-  </div>
-  <div class="row">
-    <div class="col-md-3">{{ money('alvara','Alvará', c.alvara) }}</div>
-    <div class="col-md-3">{{ money('alvara_recebido','Alvará recebido', c.alvara_recebido) }}</div>
-    <div class="col-md-3">{{ input('cooperado','Cooperado', c.cooperado) }}</div>
-    <div class="col-md-3">{{ input('cpf','CPF', c.cpf) }}</div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">{{ input('advogado','Advogado', c.advogado) }}</div>
-    <div class="col-md-4">{{ money('valor_entrada','Valor de entrada', c.valor_entrada) }}</div>
-    <div class="col-md-4">{{ date('vencimento_entrada','Vencimento entrada', c.vencimento_entrada) }}</div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">{{ money('valor_parcelas','Valor das parcelas', c.valor_parcelas) }}</div>
-    <div class="col-md-4">{{ input('parcelas','Parcelas', c.parcelas) }}</div>
-    <div class="col-md-4">{{ input('parcelas_restantes','Parcelas restantes', c.parcelas_restantes) }}</div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">{{ date('vencimento_parcelas','Vencimento das parcelas', c.vencimento_parcelas) }}</div>
-    <div class="col-md-4">{{ input('qtd_boletos_emitidos','Quantidade boletos emitidos', c.qtd_boletos_emitidos) }}</div>
-    <div class="col-md-4">{{ money('valor_pg_boleto','Valor pg com boleto', c.valor_pg_boleto) }}</div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">{{ date('data_pg_boleto','Data pg boleto', c.data_pg_boleto) }}</div>
-    <div class="col-md-4">{{ date('data_baixa','Data da baixa', c.data_baixa) }}</div>
-    <div class="col-md-4">{{ money('valor_repassar_escritorio','Valor a repassar p/ escritório (honorários)', c.valor_repassar_escritorio) }}</div>
-  </div>
+  <div class="col-md-2"><label class="form-label">Tipo</label><input name="tipo" class="form-control" value="{{ c.tipo }}"></div>
+  <div class="col-md-3"><label class="form-label">Garantia</label><input name="garantia" class="form-control" value="{{ c.garantia }}"></div>
+  <div class="col-md-3"><label class="form-label">Valor</label><input name="valor" class="form-control" value="{{ c.valor }}"></div>
+  <div class="col-md-4"><label class="form-label">Baixa acima de 48 meses</label><input name="baixa_48_meses" class="form-control" value="{{ c.baixa_48_meses }}"></div>
 
-  {{ textarea('obs_contabilidade','Obs para contabilidade:', c.obs_contabilidade) }}
-  {{ textarea('obs_contas_receber','Obs do contas a receber:', c.obs_contas_receber) }}
+  <div class="col-md-3"><label class="form-label">Valor abatido</label><input name="valor_abatido" class="form-control" value="{{ c.valor_abatido }}"></div>
+  <div class="col-md-3"><label class="form-label">Ganho</label><input name="ganho" class="form-control" value="{{ c.ganho }}"></div>
 
-  <div class="mt-2">
-    <button class="btn btn-primary">Salvar</button>
+  <div class="col-md-3"><label class="form-label">Custas</label><input name="custas" class="form-control" value="{{ c.custas }}"></div>
+  <div class="col-md-3"><label class="form-label">Custas deduzidas</label><input name="custas_deduzidas" class="form-control" value="{{ c.custas_deduzidas }}"></div>
+  <div class="col-md-3"><label class="form-label">Protesto</label><input name="protesto" class="form-control" value="{{ c.protesto }}"></div>
+  <div class="col-md-3"><label class="form-label">Protesto deduzido</label><input name="protesto_deduzido" class="form-control" value="{{ c.protesto_deduzido }}"></div>
+
+  <div class="col-md-3"><label class="form-label">Honorário</label><input name="honorario" class="form-control" value="{{ c.honorario }}"></div>
+  <div class="col-md-3"><label class="form-label">Honorário repassado</label><input name="honorario_repassado" class="form-control" value="{{ c.honorario_repassado }}"></div>
+
+  <div class="col-md-3"><label class="form-label">Alvará</label><input name="alvara" class="form-control" value="{{ c.alvara }}"></div>
+  <div class="col-md-3"><label class="form-label">Alvará recebido</label><input name="alvara_recebido" class="form-control" value="{{ c.alvara_recebido }}"></div>
+
+  <div class="col-md-3"><label class="form-label">Valor de entrada</label><input name="valor_entrada" class="form-control" value="{{ c.valor_entrada }}"></div>
+  <div class="col-md-3"><label class="form-label">Vencimento entrada</label><input name="vencimento_entrada" class="form-control" value="{{ c.vencimento_entrada }}"></div>
+
+  <div class="col-md-3"><label class="form-label">Valor das parcelas</label><input name="valor_parcela" class="form-control" value="{{ c.valor_parcela }}"></div>
+  <div class="col-md-2"><label class="form-label">Parcelas</label><input name="parcelas" class="form-control" value="{{ c.parcelas }}"></div>
+  <div class="col-md-2"><label class="form-label">Parcelas restantes</label><input name="parcelas_restantes" class="form-control" value="{{ c.parcelas_restantes }}"></div>
+  <div class="col-md-3"><label class="form-label">1º vencimento parcelas</label><input name="vencimento_parcelas" class="form-control" value="{{ c.vencimento_parcelas }}"></div>
+
+  <div class="col-md-3"><label class="form-label">Qtd. boletos</label><input name="qtd_boletos" class="form-control" value="{{ c.qtd_boletos }}"></div>
+  <div class="col-md-3"><label class="form-label">Valor pago com boleto</label><input name="valor_pg_boleto" class="form-control" value="{{ c.valor_pg_boleto }}"></div>
+  <div class="col-md-3"><label class="form-label">Data pg boleto</label><input name="data_pg_boleto" class="form-control" value="{{ c.data_pg_boleto }}"></div>
+  <div class="col-md-3"><label class="form-label">Data da baixa</label><input name="data_baixa" class="form-control" value="{{ c.data_baixa }}"></div>
+
+  <div class="col-12"><label class="form-label">Obs contabilidade</label><textarea name="obs_contabilidade" class="form-control" rows="2">{{ c.obs_contabilidade }}</textarea></div>
+  <div class="col-12"><label class="form-label">Obs contas a receber</label><textarea name="obs_contas_receber" class="form-control" rows="2">{{ c.obs_contas_receber }}</textarea></div>
+
+  <div class="col-md-3"><label class="form-label">Valor a repassar p/ escritório</label><input name="valor_repassar_escritorio" class="form-control" value="{{ c.valor_repassar_escritorio }}"></div>
+
+  <div class="col-12">
+    <button class="btn btn-success">Salvar</button>
     <a class="btn btn-secondary" href="{{ url_for('index') }}">Voltar</a>
   </div>
 </form>

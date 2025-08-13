@@ -1,6 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="h5">Parcelas - Contrato {{ c.contrato or c.id }}</h1>
-<p class="text-muted">Placeholder para gerenciamento de parcelas.</p>
+<h4>Parcelas — Contrato {{ c.contrato or c.id }}</h4>
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card card-body">Valor contrato: <b>R$ {{ "{:,.2f}".format(c.valor or 0).replace(",", "X").replace(".", ",").replace("X",".") }}</b></div></div>
+  <div class="col-md-3"><div class="card card-body">Valor parcela: <b>R$ {{ "{:,.2f}".format(c.valor_parcela or 0).replace(",", "X").replace(".", ",").replace("X",".") }}</b></div></div>
+  <div class="col-md-3"><div class="card card-body">Parcelas: <b>{{ c.parcelas }}</b></div></div>
+  <div class="col-md-3"><div class="card card-body">1º venc.: <b>{{ c.vencimento_parcelas }}</b></div></div>
+</div>
+<table class="table table-sm table-striped align-middle">
+  <thead><tr><th>#</th><th>Vencimento</th><th class="text-end">Valor</th><th>Baixa</th></tr></thead>
+  <tbody>
+  {% for p in parcelas %}
+    <tr>
+      <td>{{ p.numero }}</td>
+      <td>{{ p.vencimento }}</td>
+      <td class="text-end">R$ {{ "{:,.2f}".format(p.valor or 0).replace(",", "X").replace(".", ",").replace("X",".") }}</td>
+      <td>
+        {% if p.baixado_em %}
+          <span class="text-success">Baixada em {{ p.baixado_em }}</span>
+        {% else %}
+          <form method="post" action="{{ url_for('baixa_parcela', pid=p.id) }}">
+            <button class="btn btn-primary btn-sm">Dar baixa</button>
+          </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
 <a class="btn btn-secondary" href="{{ url_for('index') }}">Voltar</a>
 {% endblock %}
