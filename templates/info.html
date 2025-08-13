@@ -1,25 +1,55 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Informações do Contrato</h3>
-<table class="table table-sm">
-  <tr><th>ID</th><td>{{ c.id }}</td></tr>
-  <tr><th>CPF</th><td>{{ c.cpf }}</td></tr>
-  <tr><th>Cliente</th><td>{{ c.cliente }}</td></tr>
-  <tr><th>Contrato</th><td>{{ c.contrato }}</td></tr>
-  <tr><th>Tipo</th><td>{{ c.tipo }}</td></tr>
-  <tr><th>Valor</th><td>R$ {{ (c.valor or 0)|brl }}</td></tr>
-  <tr><th>Pago</th><td>R$ {{ (c.pago or 0)|brl }}</td></tr>
-  <tr><th>Abatido</th><td>R$ {{ (c.abatido or 0)|brl }}</td></tr>
-  <tr><th>Custas</th><td>R$ {{ (c.custas or 0)|brl }}</td></tr>
-  <tr><th>Custas deduzida</th><td>R$ {{ (c.custas_deduzida or 0)|brl }}</td></tr>
-  <tr><th>Protesto</th><td>R$ {{ (c.protesto or 0)|brl }}</td></tr>
-  <tr><th>Protesto deduzido</th><td>R$ {{ (c.protesto_deduzido or 0)|brl }}</td></tr>
-  <tr><th>Honorário</th><td>R$ {{ (c.honorario or 0)|brl }}</td></tr>
-  <tr><th>Honorário repassado</th><td>R$ {{ (c.honorario_repassado or 0)|brl }}</td></tr>
-  <tr><th>Alvará</th><td>R$ {{ (c.alvara or 0)|brl }}</td></tr>
-  <tr><th>Alvará recebido</th><td>R$ {{ (c.alvara_recebido or 0)|brl }}</td></tr>
-  <tr><th>Ganho</th><td>R$ {{ (c.ganho or 0)|brl }}</td></tr>
-  <tr><th>Criado em</th><td>{{ c.created_at|data }}</td></tr>
-</table>
-<a class="btn btn-secondary btn-sm" href="{{ url_for('index') }}">Voltar</a>
+<h4>Informações do contrato #{{ c.id }} — {{ c.contrato }}</h4>
+<div class="row g-2">
+  {% macro card(title, value) -%}
+  <div class="col-md-3">
+    <div class="card card-small">
+      <div class="card-body">
+        <div class="small text-muted">{{ title }}</div>
+        <div class="fw-bold">{{ value }}</div>
+      </div>
+    </div>
+  </div>
+  {%- endmacro %}
+
+  {{ card('Cliente', c.cliente) }}
+  {{ card('Tipo', c.tipo) }}
+  {{ card('Garantia', c.garantia) }}
+  {{ card('Valor no sistema', 'R$ ' ~ (c.valor_contrato_sistema or 0)|brl) }}
+  {{ card('Valor abatido', 'R$ ' ~ (c.valor_abatido or 0)|brl) }}
+  {{ card('Ganho', 'R$ ' ~ (c.ganho or 0)|brl) }}
+  {{ card('Custas', 'R$ ' ~ (c.custas or 0)|brl) }}
+  {{ card('Custas deduzidas', 'R$ ' ~ (c.custas_deduzidas or 0)|brl) }}
+  {{ card('Protesto', 'R$ ' ~ (c.protesto or 0)|brl) }}
+  {{ card('Protesto deduzido', 'R$ ' ~ (c.protesto_deduzido or 0)|brl) }}
+  {{ card('Honorário','R$ ' ~ (c.honorario or 0)|brl) }}
+  {{ card('Honorário repassado','R$ ' ~ (c.honorario_repassado or 0)|brl) }}
+  {{ card('Alvará', 'R$ ' ~ (c.alvara or 0)|brl) }}
+  {{ card('Alvará recebido', 'R$ ' ~ (c.alvara_recebido or 0)|brl) }}
+  {{ card('Entrada', 'R$ ' ~ (c.valor_entrada or 0)|brl) }}
+  {{ card('Venc. entrada', c.vencimento_entrada) }}
+  {{ card('Valor parcela', 'R$ ' ~ (c.valor_parcela or 0)|brl) }}
+  {{ card('Parcelas', (c.parcelas_restantes or 0) ~ '/' ~ (c.parcelas_qtd or 0)) }}
+  {{ card('1º vencimento', c.primeiro_vencimento) }}
+  {{ card('Qtd boletos', c.qtd_boletos or 0) }}
+  {{ card('Valor pg boleto', 'R$ ' ~ (c.valor_pg_boleto or 0)|brl) }}
+  {{ card('Data pg boleto', c.data_pg_boleto) }}
+  {{ card('Data baixa', c.data_baixa) }}
+  {{ card('Repasse escritório', 'R$ ' ~ (c.valor_repassar_escritorio or 0)|brl) }}
+</div>
+
+<div class="mt-3">
+  <a class="btn btn-primary" href="{{ url_for('parcelas', id=c.id) }}">Ver parcelas</a>
+  <a class="btn btn-warning" href="{{ url_for('editar', id=c.id) }}">Editar</a>
+</div>
+
+<div class="row mt-3">
+  <div class="col-md-6">
+    <div class="card"><div class="card-header">Obs contabilidade</div><div class="card-body"><pre class="mb-0">{{ c.obs_contabilidade or '-' }}</pre></div></div>
+  </div>
+  <div class="col-md-6">
+    <div class="card"><div class="card-header">Obs contas a receber</div><div class="card-body"><pre class="mb-0">{{ c.obs_receber or '-' }}</pre></div></div>
+  </div>
+</div>
 {% endblock %}

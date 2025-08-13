@@ -1,39 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
-<h3>Parcelas - Contrato {{ contrato.contrato or contrato.id }}</h3>
+<h4>Parcelas - Contrato {{ contrato.contrato or contrato.id }}</h4>
 
-<div class="row g-2 mb-3">
-  {% set cards = [
-    ('Valor', resumo.valor),
-    ('Valor pago', resumo.valor_pago),
-    ('Valor abatido', resumo.valor_abatido),
-    ('Custas', resumo.custas),
-    ('Custas deduzida', resumo.custas_deduzida),
-    ('Protesto', resumo.protesto),
-    ('Protesto deduzido', resumo.protesto_deduzido),
-    ('Honorário', resumo.honorario),
-    ('Honorário repassado', resumo.honorario_repassado),
-    ('Alvará', resumo.alvara),
-    ('Alvará recebido', resumo.alvara_recebido),
-    ('Ganho', resumo.ganho),
-    ('Qtde parcelas', resumo.qtd_parcelas),
-    ('Pagas', resumo.parcelas_pagas),
-    ('Em aberto', resumo.parcelas_abertas),
-  ] %}
-  {% for titulo, val in cards %}
+<div class="row g-2 mb-2">
+  {% macro card(title, value) -%}
   <div class="col-md-3">
-    <div class="border rounded p-2">
-      <small class="text-muted">{{ titulo }}</small>
-      <div class="fw-bold">
-        {% if 'parcelas' in titulo or titulo in ['Qtde parcelas','Pagas','Em aberto'] %}
-          {{ val }}
-        {% else %}
-          R$ {{ (val or 0)|brl }}
-        {% endif %}
+    <div class="card card-small">
+      <div class="card-body">
+        <div class="small text-muted">{{ title }}</div>
+        <div class="fw-bold">{{ value }}</div>
       </div>
     </div>
   </div>
-  {% endfor %}
+  {%- endmacro %}
+
+  {{ card('Valor', 'R$ ' ~ (resumo.valor or 0)|brl) }}
+  {{ card('Valor pago (boleto)', 'R$ ' ~ (resumo.pago or 0)|brl) }}
+  {{ card('Valor abatido', 'R$ ' ~ (resumo.abatido or 0)|brl) }}
+  {{ card('Custas', 'R$ ' ~ (resumo.custas or 0)|brl) }}
+  {{ card('Honorário', 'R$ ' ~ (resumo.honorario or 0)|brl) }}
+  {{ card('Alvará', 'R$ ' ~ (resumo.alvara or 0)|brl) }}
+  {{ card('Ganho', 'R$ ' ~ (resumo.ganho or 0)|brl) }}
 </div>
 
 <table class="table table-sm table-striped align-middle">
@@ -46,24 +33,24 @@
     </tr>
   </thead>
   <tbody>
-    {% for p in parcels %}
+  {% for p in parcels %}
     <tr>
       <td>{{ p.numero }}</td>
-      <td>{{ p.vencimento|data }}</td>
+      <td>{{ p.vencimento }}</td>
       <td>R$ {{ (p.valor or 0)|brl }}</td>
       <td>
         {% if p.baixado_em %}
-          <span class="text-success">Baixada em {{ p.baixado_em|data }}</span>
+          <span class="text-success">Baixada em {{ p.baixado_em }}</span>
         {% else %}
-          <form method="post" action="{{ url_for('baixar_parcela', contrato_id=contrato.id, parcela_id=p.id) }}">
+          <form method="post" action="{{ url_for('baixar_parcela', parcela_id=p.id) }}">
             <button class="btn btn-primary btn-sm">Dar Baixa</button>
           </form>
         {% endif %}
       </td>
     </tr>
-    {% endfor %}
+  {% endfor %}
   </tbody>
 </table>
 
-<a class="btn btn-secondary btn-sm" href="{{ url_for('index') }}">Voltar</a>
+<a class="btn btn-secondary" href="{{ url_for('index') }}">Voltar</a>
 {% endblock %}
